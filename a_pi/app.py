@@ -1,8 +1,11 @@
 from flask import Flask
 import sqlite3
 import click
+import random
+import string
 from flask import current_app, g, request
 from flask.cli import with_appcontext
+from werkzeug.exceptions import abort
 import os
 
 def get_db():
@@ -61,9 +64,34 @@ def create_app(test_config=None):
 
     @app.route('/', methods=('GET', 'POST'))
     def hello():
-        #if request.method == 'POST':
-        digit = request.form['digit']
-        return 'Hello, World! : {}'.format(digit)
+        digits = [str(i) for i in range(0, 10)]
+        if request.method == 'POST':
+            digit = request.form['digit']
+            job = request.form['job']
+            
+            db = get_db()
+            job_current = db.execute(
+                'SELECT job.digits FROM job WHERE job.id = ?',
+                (job,)
+            ).fetchone()
+            print(job_current)
+            
+            if digit not in digits:
+                abort(400)
+            
+            if job_current is None and digit == '3':
+                job_current = ''.join(random.choices(string.ascii_letters, k=20))
+                db.execute(
+                    'INSERT INTO job (id, digits)'
+                    ' VALUES (?, ?)',
+                    (job_current, 0)
+                )
+                db.commit()
+                return job_current
+
+            return 'Hello, World! : {} for {}'.format(digit, job)
+        else:
+            abort(400)
     
     init_app(app)
 
