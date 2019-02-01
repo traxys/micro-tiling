@@ -3,6 +3,7 @@ import sqlite3
 import click
 import random
 import string
+import math
 from flask import current_app, g, request
 from flask.cli import with_appcontext
 from werkzeug.exceptions import abort
@@ -62,6 +63,22 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    def make_pi(total):
+        q, r, t, k, m, x = 1, 0, 1, 1, 3, 3
+        count = 0
+        while True:
+            if 4 * q + r - t < m * t:
+                yield m
+                count += 1
+                if count > total:
+                    break
+                q, r, t, k, m, x = 10*q, 10*(r-m*t), t, k, (10*(3*q+r))//t - 10*m, x
+            else:
+                q, r, t, k, m, x = q*k, (2*q+r)*x, t*x, k+1, (q*(7*k+2)+r*x)//(t*x), x+2
+
+    pi = [d for d in make_pi(1000)]
+    print(pi)
+
     @app.route('/', methods=('GET', 'POST'))
     def hello():
         digits = [str(i) for i in range(0, 10)]
@@ -74,20 +91,27 @@ def create_app(test_config=None):
                 'SELECT job.digits FROM job WHERE job.id = ?',
                 (job,)
             ).fetchone()
-            print(job_current)
+            print(job_current['digits'])
             
             if digit not in digits:
                 abort(400)
             
-            if job_current is None and digit == '3':
-                job_current = ''.join(random.choices(string.ascii_letters, k=20))
-                db.execute(
-                    'INSERT INTO job (id, digits)'
-                    ' VALUES (?, ?)',
-                    (job_current, 0)
-                )
-                db.commit()
-                return job_current
+            if job_current is None:
+                if digit == '3':
+                    job_current = ''.join(random.choices(string.ascii_letters, k=20))
+                    db.execute(
+                        'INSERT INTO job (id, digits)'
+                        ' VALUES (?, ?)',
+                        (job_current, 1)
+                    )
+                    db.commit()
+                    return job_current
+                else:
+                    abort(400)
+            else:
+                job_current = job_current['digits']
+
+
 
             return 'Hello, World! : {} for {}'.format(digit, job)
         else:
@@ -97,4 +121,4 @@ def create_app(test_config=None):
 
     return app
 
-create_app()
+#create_app()
