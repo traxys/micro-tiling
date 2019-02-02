@@ -81,7 +81,8 @@ def create_app(test_config=None):
 
     @app.route('/', methods=('GET', 'POST'))
     def hello():
-        digits = [str(i) for i in range(0, 10)]
+        valid = [str(i) for i in range(0, 10)]
+        valid.append('π')
         if request.method == 'POST':
             digit = request.form['digit']
             job = request.form['job']
@@ -92,7 +93,7 @@ def create_app(test_config=None):
                 (job,)
             ).fetchone()
             
-            if digit not in digits:
+            if digit not in valid:
                 abort(400)
             
             if job_current is None:
@@ -114,6 +115,11 @@ def create_app(test_config=None):
                         'UPDATE job SET digits = ?'
                         ' WHERE id = ?',
                         (job_current + 1, job)
+                    )
+                    db.execute(
+                        'INSERT INTO segment (job_id, x1, y1, x2, y2)'
+                        ' VALUES (?, ?, ?, ?, ?)',
+                        (job, random.random(), random.random(),  random.random(), random.random())
                     )
                     db.commit()
                     return 'π'
