@@ -76,7 +76,7 @@ def create_app(test_config=None):
             else:
                 q, r, t, k, m, x = q*k, (2*q+r)*x, t*x, k+1, (q*(7*k+2)+r*x)//(t*x), x+2
 
-    pi = [d for d in make_pi(1000)]
+    pi = [str(d) for d in make_pi(1000)]
     print(pi)
 
     @app.route('/', methods=('GET', 'POST'))
@@ -91,27 +91,34 @@ def create_app(test_config=None):
                 'SELECT job.digits FROM job WHERE job.id = ?',
                 (job,)
             ).fetchone()
-            print(job_current['digits'])
             
             if digit not in digits:
                 abort(400)
             
             if job_current is None:
                 if digit == '3':
-                    job_current = ''.join(random.choices(string.ascii_letters, k=20))
+                    job_id = ''.join(random.choices(string.ascii_letters, k=20))
                     db.execute(
                         'INSERT INTO job (id, digits)'
                         ' VALUES (?, ?)',
-                        (job_current, 1)
+                        (job_id, 1)
                     )
                     db.commit()
-                    return job_current
+                    return job_id
                 else:
                     abort(400)
             else:
                 job_current = job_current['digits']
-
-
+                if pi[job_current] == digit:
+                    db.execute(
+                        'UPDATE job SET digits = ?'
+                        ' WHERE id = ?',
+                        (job_current + 1, job)
+                    )
+                    db.commit()
+                    return 'π'
+                else:
+                    abort(418)
 
             return 'Hello, World! : {} for {}'.format(digit, job)
         else:
