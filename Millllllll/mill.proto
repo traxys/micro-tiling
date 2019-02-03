@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+// 2D Point
+message Point {
+	double x = 1;
+	double y = 2;
+}
+
+// Segment of two Point
+message Segment {
+	Point a = 1;
+	Point b = 2;
+}
+
+// Batch of Segment to turn
+message Job {
+	// 20 mixed case letters
+	string id = 1;
+	// Number of turns to do
+	uint32 amount = 2;
+	repeated Segment segments = 3;
+}
+
+// Turns a Job
+service Mill {
+	// Rotates each segment in a Jo
+	rpc Turn (Job) returns (Job) {}
+}
