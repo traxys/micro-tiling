@@ -1,13 +1,15 @@
-from flask import Flask
 import sqlite3
-import click
 import random
 import string
+import os
 import math
+import click
+from flask import Flask
 from flask import current_app, g, request
 from flask.cli import with_appcontext
 from werkzeug.exceptions import abort
-import os
+
+MAX_PI = 1000
 
 def get_db():
     if 'db' not in g:
@@ -41,6 +43,46 @@ def init_db_command():
 def init_app(app):
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
+    
+def make_pi(total):
+    q, r, t, k, m, x = 1, 0, 1, 1, 3, 3
+    count = 0
+    while True:
+        if 4 * q + r - t < m * t:
+            yield m
+            count += 1
+            if count > total:
+                break
+            q, r, t, k, m, x = 10*q, 10*(r-m*t), t, k, (10*(3*q+r))//t - 10*m, x
+        else:
+            q, r, t, k, m, x = q*k, (2*q+r)*x, t*x, k+1, (q*(7*k+2)+r*x)//(t*x), x+2
+
+def action(db, job_id, job_current):
+    db.execute(
+        'UPDATE job SET digits = ?'
+        ' WHERE id = ?',
+        (job_current + 1, job_id)
+    )
+    db.execute(
+        'INSERT INTO segment (job_id, x1, y1, x2, y2)'
+        ' VALUES (?, ?, ?, ?, ?)',
+        (job_id, random.random(), random.random(), random.random(), random.random())
+    )
+    db.commit()
+
+def terminate(db, job_id):
+    # TODO add RPC call
+    db.execute(
+        'DELETE FROM job'
+        ' WHERE id = ?',
+        (job_id,)
+    )
+    db.execute(
+        'DELETE FROM segment'
+        ' WHERE job_id = ?',
+        (job_id,)
+    )
+    db.commit()
 
 def create_app(test_config=None):
     # create and configure the app
@@ -63,30 +105,16 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    def make_pi(total):
-        q, r, t, k, m, x = 1, 0, 1, 1, 3, 3
-        count = 0
-        while True:
-            if 4 * q + r - t < m * t:
-                yield m
-                count += 1
-                if count > total:
-                    break
-                q, r, t, k, m, x = 10*q, 10*(r-m*t), t, k, (10*(3*q+r))//t - 10*m, x
-            else:
-                q, r, t, k, m, x = q*k, (2*q+r)*x, t*x, k+1, (q*(7*k+2)+r*x)//(t*x), x+2
-
-    pi = [str(d) for d in make_pi(1000)]
-    print(pi)
+    pi = [str(d) for d in make_pi(MAX_PI)]
 
     @app.route('/', methods=('GET', 'POST'))
     def hello():
         valid = [str(i) for i in range(0, 10)]
-        valid.append('π')
+        valid.append('&#960;')
         if request.method == 'POST':
             digit = request.form['digit']
             job = request.form['job']
-            
+
             db = get_db()
             job_current = db.execute(
                 'SELECT job.digits FROM job WHERE job.id = ?',
@@ -94,6 +122,7 @@ def create_app(test_config=None):
             ).fetchone()
             
             if digit not in valid:
+                print('ouille', digit)
                 abort(400)
             
             if job_current is None:
@@ -110,18 +139,11 @@ def create_app(test_config=None):
                     abort(400)
             else:
                 job_current = job_current['digits']
-                if pi[job_current] == digit:
-                    db.execute(
-                        'UPDATE job SET digits = ?'
-                        ' WHERE id = ?',
-                        (job_current + 1, job)
-                    )
-                    db.execute(
-                        'INSERT INTO segment (job_id, x1, y1, x2, y2)'
-                        ' VALUES (?, ?, ?, ?, ?)',
-                        (job, random.random(), random.random(),  random.random(), random.random())
-                    )
-                    db.commit()
+                if digit == '&#960;':
+                    terminate(db, job)
+                    return 'OK THX'
+                if pi[job_current] == digit and job_current < MAX_PI:
+                    action(db, job, job_current)
                     return 'π'
                 else:
                     abort(418)
