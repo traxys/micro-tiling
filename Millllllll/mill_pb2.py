@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='mill.proto',
   package='',
   syntax='proto3',
-  serialized_pb=_b('\n\nmill.proto\"\x1d\n\x05Point\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\"/\n\x07Segment\x12\x11\n\x01\x61\x18\x01 \x01(\x0b\x32\x06.Point\x12\x11\n\x01\x62\x18\x02 \x01(\x0b\x32\x06.Point\"=\n\x03Job\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x61mount\x18\x02 \x01(\r\x12\x1a\n\x08segments\x18\x03 \x03(\x0b\x32\x08.Segment2\x1c\n\x04Mill\x12\x14\n\x04Turn\x12\x04.Job\x1a\x04.Job\"\x00\x62\x06proto3')
+  serialized_pb=_b('\n\nmill.proto\"\x1d\n\x05Point\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\"/\n\x07Segment\x12\x11\n\x01\x61\x18\x01 \x01(\x0b\x32\x06.Point\x12\x11\n\x01\x62\x18\x02 \x01(\x0b\x32\x06.Point\"W\n\x03Job\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06\x61mount\x18\x02 \x01(\r\x12\x1a\n\x08segments\x18\x03 \x03(\x0b\x32\x08.Segment\x12\x18\n\x06result\x18\x04 \x03(\x0b\x32\x08.Segment2\x1c\n\x04Mill\x12\x14\n\x04Turn\x12\x04.Job\x1a\x04.Job\"\x00\x62\x06proto3')
 )
 
 
@@ -129,6 +129,13 @@ _JOB = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='result', full_name='Job.result', index=3,
+      number=4, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -142,12 +149,13 @@ _JOB = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=94,
-  serialized_end=155,
+  serialized_end=181,
 )
 
 _SEGMENT.fields_by_name['a'].message_type = _POINT
 _SEGMENT.fields_by_name['b'].message_type = _POINT
 _JOB.fields_by_name['segments'].message_type = _SEGMENT
+_JOB.fields_by_name['result'].message_type = _SEGMENT
 DESCRIPTOR.message_types_by_name['Point'] = _POINT
 DESCRIPTOR.message_types_by_name['Segment'] = _SEGMENT
 DESCRIPTOR.message_types_by_name['Job'] = _JOB
@@ -182,8 +190,8 @@ _MILL = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   options=None,
-  serialized_start=157,
-  serialized_end=185,
+  serialized_start=183,
+  serialized_end=211,
   methods=[
   _descriptor.MethodDescriptor(
     name='Turn',

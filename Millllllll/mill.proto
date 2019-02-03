@@ -19,6 +19,8 @@ message Job {
 	// Number of turns to do
 	uint32 amount = 2;
 	repeated Segment segments = 3;
+	// Final figure
+	repeated Segment result = 4;
 }
 
 // Turns a Job
