@@ -9,7 +9,13 @@ from flask import current_app, g, request
 from flask.cli import with_appcontext
 from werkzeug.exceptions import abort
 
+import grpc
+
+import mill_pb2
+import mill_pb2_grpc
+
 MAX_PI = 1000
+MILLLLLLLL_ADDR = '127.0.0.1:5001'
 
 def get_db():
     if 'db' not in g:
@@ -70,8 +76,29 @@ def action(db, job_id, job_current):
     )
     db.commit()
 
-def terminate(db, job_id):
+def terminate(db, job_id, mill_stub):
     # TODO add RPC call
+    segments = db.execute(
+        'SELECT x1, y1, x2, y2 FROM segment'
+        ' WHERE job_id = ?',
+        (job_id,)
+    ).fetchall()
+
+    segments = [mill_pb2.Segment(
+                    a=mill_pb2.Point(
+                        x=s['x1'],
+                        y=s['y1']),
+                    b=mill_pb2.Point(
+                        x=s['x2'],
+                        y=s['x2'])) for s in segments]
+    
+    mill_stub.Turn(
+        mill_pb2.Job(
+            id=job_id,
+            amount=8,
+            segments=segments
+    ))
+    
     db.execute(
         'DELETE FROM job'
         ' WHERE id = ?',
@@ -104,6 +131,9 @@ def create_app(test_config=None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
+
+    channel = grpc.insecure_channel(MILLLLLLLL_ADDR)
+    mill_stub = mill_pb2_grpc.MillStub(channel)
 
     pi = [str(d) for d in make_pi(MAX_PI)]
 
@@ -140,7 +170,7 @@ def create_app(test_config=None):
             else:
                 job_current = job_current['digits']
                 if digit == 'π':
-                    terminate(db, job)
+                    terminate(db, job, mill_stub)
                     return 'OK THX'
                 if pi[job_current] == digit and job_current < MAX_PI:
                     action(db, job, job_current)
