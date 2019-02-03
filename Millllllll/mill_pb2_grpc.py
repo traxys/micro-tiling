@@ -17,7 +17,7 @@ class MillStub(object):
     self.Turn = channel.unary_unary(
         '/Mill/Turn',
         request_serializer=mill__pb2.Job.SerializeToString,
-        response_deserializer=mill__pb2.Job.FromString,
+        response_deserializer=mill__pb2.Response.FromString,
         )
 
 
@@ -26,7 +26,7 @@ class MillServicer(object):
   """
 
   def Turn(self, request, context):
-    """Rotates each segment in a Jo
+    """Rotates each segment in a Job
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
@@ -38,7 +38,7 @@ def add_MillServicer_to_server(servicer, server):
       'Turn': grpc.unary_unary_rpc_method_handler(
           servicer.Turn,
           request_deserializer=mill__pb2.Job.FromString,
-          response_serializer=mill__pb2.Job.SerializeToString,
+          response_serializer=mill__pb2.Response.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(

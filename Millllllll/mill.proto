@@ -23,8 +23,10 @@ message Job {
 	repeated Segment result = 4;
 }
 
+message Response {}
+
 // Turns a Job
 service Mill {
-	// Rotates each segment in a Jo
-	rpc Turn (Job) returns (Job) {}
+	// Rotates each segment in a Job
+	rpc Turn (Job) returns (Response) {}
 }
