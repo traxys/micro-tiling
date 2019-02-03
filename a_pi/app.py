@@ -110,7 +110,7 @@ def create_app(test_config=None):
     @app.route('/', methods=('GET', 'POST'))
     def hello():
         valid = [str(i) for i in range(0, 10)]
-        valid.append('&#960;')
+        valid.append('π')
         if request.method == 'POST':
             digit = request.form['digit']
             job = request.form['job']
@@ -122,7 +122,7 @@ def create_app(test_config=None):
             ).fetchone()
             
             if digit not in valid:
-                print('ouille', digit)
+                print('unexpected :', digit)
                 abort(400)
             
             if job_current is None:
@@ -139,7 +139,7 @@ def create_app(test_config=None):
                     abort(400)
             else:
                 job_current = job_current['digits']
-                if digit == '&#960;':
+                if digit == 'π':
                     terminate(db, job)
                     return 'OK THX'
                 if pi[job_current] == digit and job_current < MAX_PI:
