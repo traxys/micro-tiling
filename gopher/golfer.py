@@ -11,11 +11,17 @@ from os.path import isfile, join
 def get_entries():
     """returns [(DirEntry)]
     """
-    return (("0" + f + "\t"
-             + "0/" + f + "\t"
-             + HOST + "\t"
-             + str(TCP_PORT) + "\n")
-            for f in listdir(FILE_DIR) if isfile(join(FILE_DIR, f)))
+    yield ("!" + "newfile" + "\t"
+           + "!/" + "newfile" + "\t"
+           + HOST + "\t"
+           + str(TCP_PORT) + "\n")
+    for entry in (("0" + f + "\t"
+                   + "0/" + f + "\t"
+                   + HOST + "\t"
+                   + str(TCP_PORT) + "\n")
+                  for f in listdir(FILE_DIR)
+                  if isfile(join(FILE_DIR, f))):
+        yield entry
 
 def get_selectors():
     return ((f, "0/" + f)
@@ -39,6 +45,8 @@ def main():
             print("Listing files")
             for entry in get_entries():
                 conn.send(entry.encode())
+        if data == "!/newfile":
+            print("New file !")
         for file_name, selector in get_selectors():
             if selector == data:
                 selected_file = open(FILE_DIR+'/'+file_name, "r")
