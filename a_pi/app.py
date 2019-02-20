@@ -103,6 +103,11 @@ def terminate(db, job_id, mill_stub):
                         x=s['x2'],
                         y=s['x2'])) for s in segments]
     
+    room.send_text('@'+json.dumps({
+        "msg": "Sent segments to mill",
+        "service": "a_pi",
+        "id": job_id}))
+
     mill_stub.Turn(
         mill_pb2.Job(
             id=mill_pb2.JobId(
@@ -122,11 +127,6 @@ def terminate(db, job_id, mill_stub):
         (job_id,)
     )
     db.commit()
-    room.send_text('@'+json.dumps({
-        "msg": "Sent segments to mill",
-        "service": "a_pi",
-        "id": job_id}))
-
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)

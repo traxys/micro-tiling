@@ -8,6 +8,17 @@ from google.protobuf import json_format
 
 GOPHER_PATH = '/srv/gopher/'
 
+from matrix_client.client import MatrixClient
+client = MatrixClient("http://localhost:8008")
+
+import json
+matrix_param_file = open("../matrix_user.json","r")
+matrix_param = json.loads(matrix_param_file.read())
+matrix_param_file.close()
+
+token = client.login(username=matrix_param["username"], password=matrix_param["password"])
+room = client.join_room(matrix_param["room"]);
+
 def write(job):
     f = open(GOPHER_PATH + job.id.id, 'w')
     print(list(job.result))
@@ -17,6 +28,11 @@ def write(job):
 class MillServicer(mill_pb2_grpc.MillServicer):
     def Turn(self, request, context):
         write(request)
+        room.send_text('@' + json.dumps({
+            "msg": "Turned segments",
+            "service": "millllllll",
+            "id": request.id.id
+        }))
         return mill_pb2.Response()
 
 def serve():
