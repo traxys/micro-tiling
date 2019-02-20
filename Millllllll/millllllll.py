@@ -6,7 +6,7 @@ import mill_pb2
 import mill_pb2_grpc
 from google.protobuf import json_format
 
-GOPHER_PATH = '/srv/gopher/'
+GOPHER_PATH = '../gopher/files/'
 
 from matrix_client.client import MatrixClient
 client = MatrixClient("http://localhost:8008")
@@ -20,6 +20,11 @@ token = client.login(username=matrix_param["username"], password=matrix_param["p
 room = client.join_room(matrix_param["room"]);
 
 def write(job):
+    room.send_text('@' + json.dumps({
+        "msg": "Wrote to gopher server",
+        "service": "millllllll",
+        "id": job.id.id
+    }))
     f = open(GOPHER_PATH + job.id.id, 'w')
     print(list(job.result))
     f.write(json.dumps(list(job.result)))

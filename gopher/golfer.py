@@ -2,7 +2,7 @@ import socket
 
 TCP_IP = '127.0.0.1'
 HOST = 'Golfer'
-TCP_PORT = 7777
+TCP_PORT = 3333
 FILE_DIR = 'files'
 
 from os import listdir
