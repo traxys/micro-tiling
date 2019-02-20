@@ -94,7 +94,8 @@ def terminate(db, job_id, mill_stub):
     
     mill_stub.Turn(
         mill_pb2.Job(
-            id=job_id,
+            id=mill_pb2.JobId(
+                id=job_id),
             amount=8,
             segments=segments
     ))

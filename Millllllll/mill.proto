@@ -15,12 +15,16 @@ message Segment {
 // Batch of Segment to turn
 message Job {
 	// 20 mixed case letters
-	string id = 1;
+	JobId id = 1;
 	// Number of turns to do
 	uint32 amount = 2;
 	repeated Segment segments = 3;
 	// Final figure
 	repeated Segment result = 4;
+}
+
+message JobId {
+	string id = 1;
 }
 
 message Response {}
@@ -29,4 +33,5 @@ message Response {}
 service Mill {
 	// Rotates each segment in a Job
 	rpc Turn (Job) returns (Response) {}
+	rpc Delete (JobId) returns (Response) {}
 }

@@ -19,6 +19,11 @@ class MillStub(object):
         request_serializer=mill__pb2.Job.SerializeToString,
         response_deserializer=mill__pb2.Response.FromString,
         )
+    self.Delete = channel.unary_unary(
+        '/Mill/Delete',
+        request_serializer=mill__pb2.JobId.SerializeToString,
+        response_deserializer=mill__pb2.Response.FromString,
+        )
 
 
 class MillServicer(object):
@@ -32,12 +37,24 @@ class MillServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def Delete(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_MillServicer_to_server(servicer, server):
   rpc_method_handlers = {
       'Turn': grpc.unary_unary_rpc_method_handler(
           servicer.Turn,
           request_deserializer=mill__pb2.Job.FromString,
+          response_serializer=mill__pb2.Response.SerializeToString,
+      ),
+      'Delete': grpc.unary_unary_rpc_method_handler(
+          servicer.Delete,
+          request_deserializer=mill__pb2.JobId.FromString,
           response_serializer=mill__pb2.Response.SerializeToString,
       ),
   }
