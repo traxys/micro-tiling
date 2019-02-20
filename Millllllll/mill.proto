@@ -33,5 +33,4 @@ message Response {}
 service Mill {
 	// Rotates each segment in a Job
 	rpc Turn (Job) returns (Response) {}
-	rpc Delete (JobId) returns (Response) {}
 }
