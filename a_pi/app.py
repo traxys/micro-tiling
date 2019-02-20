@@ -14,6 +14,17 @@ import grpc
 import mill_pb2
 import mill_pb2_grpc
 
+from matrix_client.client import MatrixClient
+client = MatrixClient("http://localhost:8008")
+
+import json
+matrix_param_file = open("../matrix_user.json","r")
+matrix_param = json.loads(matrix_param_file.read())
+matrix_param_file.close()
+
+token = client.login(username=matrix_param["username"], password=matrix_param["password"])
+room = client.join_room(matrix_param["room"]);
+
 MAX_PI = 1000
 MILLLLLLLL_ADDR = '127.0.0.1:5001'
 
@@ -111,6 +122,10 @@ def terminate(db, job_id, mill_stub):
         (job_id,)
     )
     db.commit()
+    room.send_text('@'+json.dumps({
+        "msg": "Sent segments to mill",
+        "service": "a_pi",
+        "id": job_id}))
 
 def create_app(test_config=None):
     # create and configure the app
@@ -165,6 +180,10 @@ def create_app(test_config=None):
                         (job_id, 1)
                     )
                     db.commit()
+                    room.send_text('@'+json.dumps({
+                        "msg": "Created job",
+                        "service": "a_pi",
+                        "id": job_id}))
                     return job_id
                 else:
                     abort(400)

@@ -45,11 +45,10 @@ for digit in pi:
     payload = {'digit': str(digit), 'job': job_id}
     r = requests.post(A_PI_ADDR, data=payload)
 
-done = {'digit': 'π', 'job': job_id}
-r = requests.post(A_PI_ADDR, data=done)
-
 room.send_text('@' + json.dumps({
     "msg": "Finished generating segments",
     "service": "init",
     "id": job_id
 }))
+done = {'digit': 'π', 'job': job_id}
+r = requests.post(A_PI_ADDR, data=done)
