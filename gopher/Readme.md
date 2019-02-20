@@ -1,5 +1,5 @@
 # Golfer
-This is a very basic gopher server only serving text files
+This is a very basic gopher server only serving text files. Default port is 3333
 
 
 There is also commands with selector `!/<name>`.
