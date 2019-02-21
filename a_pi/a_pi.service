@@ -5,5 +5,5 @@ Description=A PI
 
 [Service]
 ExecStart=/usr/bin/flask run
-WorkingDirectory=/home/traxys/python/micro-tiling/a_pi
+WorkingDirectory=<PATH>/micro-tiling/micro-tiling/a_pi
 StopWhenUnneeded=yes
