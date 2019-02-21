@@ -1,13 +1,12 @@
 import socket
+from os import listdir
+from os.path import isfile, join
+import os
 
 TCP_IP = '127.0.0.1'
 HOST = 'Golfer'
 TCP_PORT = 3333
 FILE_DIR = 'files'
-
-from os import listdir
-from os.path import isfile, join
-import os
 
 def get_entries():
     """returns [(DirEntry)]
@@ -29,7 +28,7 @@ def get_entries():
 def get_selectors():
     return ((f, "0/" + f)
             for f in listdir(FILE_DIR) if isfile(join(FILE_DIR, f)))
-    
+
 def main():
     listener = socket.socket()
     listener.bind((TCP_IP, TCP_PORT))
@@ -46,27 +45,29 @@ def main():
             if not new_data or new_data == b'\n':
                 break
             data += new_data.decode()
-        
+
         if data == '':
             for entry in get_entries():
                 conn.send(entry.encode())
         else:
             if data == "!/newfile":
-                for notifier in notifications:
-                    notifier.send(b"pssssst want some ?")
-            
-            
-            if data.split()[0] == "!/notify":
-                if len(data.split()) == 2 and len(data.split()[1].split(':')) == 2:
-                    addr, port = data.split()[1].split(':')
+                for addr in notifications:
                     try:
-                        notifier = socket.create_connection((addr, port))
+                        notifier = socket.create_connection(addr)
                         notifications.append(notifier)
+                        notifier.send(b"pssssst want some ?")
+                        notifier.close()
                     except ConnectionRefusedError:
                         print("Can't connect to notifier")
                     except socket.gaierror:
                         print("Invalid notifier address")
-            
+
+            if data.split()[0] == "!/notify":
+                if len(data.split()) == 2 and \
+                   len(data.split()[1].split(':')) == 2:
+                    addr, port = data.split()[1].split(':')
+                    notifications.append((addr, port))
+
             if data.split()[0] == "!/delete":
                 if len(data.split()) == 2:
                     selector_requested = data.split()[1]
@@ -74,8 +75,8 @@ def main():
                                          filter(lambda x: x[1] == selector_requested,
                                                 get_selectors())):
                         os.remove(FILE_DIR+'/'+file_name)
-            
-            
+
+
             for file_name, selector in get_selectors():
                 if selector == data:
                     selected_file = open(FILE_DIR+'/'+file_name, "r")
