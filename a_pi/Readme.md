@@ -4,6 +4,7 @@ An API over HTTP using the digits of pi to execute a function repeatedly. Defaul
 ## Dependencies
 - Flask: `pip install Flask`
 - gRPC: `pip install grpcio`
+- Matrix SDK: `pip install matrix_client`
 
 ## Usage:
 	
