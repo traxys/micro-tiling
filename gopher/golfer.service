@@ -3,5 +3,5 @@ Description=Golfer Server
 
 [Service]
 ExecStart=<PATH>/micro-tiling/gopher/golfer.py
-WorkingDirectory=/home/traxys/python/micro-tiling/gopher
+WorkingDirectory=<PATH>/micro-tiling/gopher
 StopWhenUnneeded=yes
