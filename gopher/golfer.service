@@ -1,0 +1,7 @@
+[Unit]
+Description=Golfer Server
+
+[Service]
+ExecStart=/usr/bin/python /home/traxys/python/micro-tiling/gopher/golfer.py
+WorkingDirectory=/home/traxys/python/micro-tiling/gopher
+StopWhenUnneeded=yes

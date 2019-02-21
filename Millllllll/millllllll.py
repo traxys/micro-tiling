@@ -4,14 +4,18 @@ import grpc
 import json
 import mill_pb2
 import mill_pb2_grpc
-from google.protobuf import json_format
+import socket
+import json
+from matrix_client.client import MatrixClient
 
 GOPHER_PATH = '../gopher/files/'
+GOPHER_IP = '127.0.0.1'
+GOPHER_PORT = 3333
 
-from matrix_client.client import MatrixClient
+GOPHER_SOCKET = socket.create_connection((GOPHER_IP, GOPHER_PORT))
+
 client = MatrixClient("http://localhost:8008")
 
-import json
 matrix_param_file = open("../matrix_user.json","r")
 matrix_param = json.loads(matrix_param_file.read())
 matrix_param_file.close()
@@ -29,6 +33,7 @@ def write(job):
     print(list(job.result))
     f.write(json.dumps(list(job.result)))
     f.close()
+    GOPHER_SOCKET.send(b'!/notify')
 
 class MillServicer(mill_pb2_grpc.MillServicer):
     def Turn(self, request, context):

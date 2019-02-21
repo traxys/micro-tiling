@@ -56,5 +56,6 @@ def generate_segments():
     }))
     done = {'digit': 'π', 'job': job_id}
     r = requests.post(A_PI_ADDR, data=done)
+    return job_id
 
 generate_segments()

@@ -1,0 +1,9 @@
+[Unit]
+Requires=millllllll.service
+After=millllllll.service
+Description=A PI
+
+[Service]
+ExecStart=/usr/bin/flask run
+WorkingDirectory=/home/traxys/python/micro-tiling/a_pi
+StopWhenUnneeded=yes
