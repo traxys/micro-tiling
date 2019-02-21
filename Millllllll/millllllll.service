@@ -4,6 +4,6 @@ After=golfer.service
 Description=Millllllll
 
 [Service]
-ExecStart=/usr/bin/python /home/traxys/python/micro-tiling/Millllllll/millllllll.py
-WorkingDirectory=/home/traxys/python/micro-tiling/Millllllll
+ExecStart=/usr/bin/python <PATH>/micro-tiling/Millllllll/millllllll.py
+WorkingDirectory=<PATH>/micro-tiling/Millllllll
 StopWhenUnneeded=yes
