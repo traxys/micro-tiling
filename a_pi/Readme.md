@@ -2,7 +2,7 @@
 An API over HTTP using the digits of pi to execute a function repeatedly. Default port is 5001
 
 ## Dependencies
--Flask: `pip install Flask`
+- Flask: `pip install Flask`
 
 ## Usage:
 	
