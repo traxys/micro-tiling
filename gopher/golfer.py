@@ -38,14 +38,14 @@ def main():
     notifications = []
 
     while True:
-        conn, _ = listener.accept()
+        conn, addr = listener.accept()
         data = ""
         while True:
             new_data = conn.recv(1)
             if not new_data or new_data == b'\n':
                 break
             data += new_data.decode()
-
+        print(data, "from", addr)
         if data == '':
             for entry in get_entries():
                 conn.send(entry.encode())
@@ -54,21 +54,22 @@ def main():
                 for addr in notifications:
                     try:
                         notifier = socket.create_connection(addr)
-                        notifications.append(notifier)
                         notifier.send(b"pssssst want some ?")
                         notifier.close()
                     except ConnectionRefusedError:
                         print("Can't connect to notifier")
                     except socket.gaierror:
                         print("Invalid notifier address")
+                print("Notified")
 
-            if data.split()[0] == "!/notify":
+            elif data.split()[0] == "!/notify":
+                print("Added hook: ", data)
                 if len(data.split()) == 2 and \
                    len(data.split()[1].split(':')) == 2:
                     addr, port = data.split()[1].split(':')
                     notifications.append((addr, port))
 
-            if data.split()[0] == "!/delete":
+            elif data.split()[0] == "!/delete":
                 if len(data.split()) == 2:
                     selector_requested = data.split()[1]
                     for file_name in map(lambda x: x[0],

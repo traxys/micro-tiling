@@ -12,8 +12,6 @@ GOPHER_PATH = '../gopher/files/'
 GOPHER_IP = '127.0.0.1'
 GOPHER_PORT = 3333
 
-GOPHER_SOCKET = socket.create_connection((GOPHER_IP, GOPHER_PORT))
-
 client = MatrixClient("http://localhost:8008")
 
 matrix_param_file = open("../matrix_user.json","r")
@@ -33,7 +31,10 @@ def write(job):
     print(list(job.result))
     f.write(json.dumps(list(job.result)))
     f.close()
-    GOPHER_SOCKET.send(b'!/notify')
+    GOPHER_SOCKET = \
+        socket.create_connection((GOPHER_IP, GOPHER_PORT))
+    GOPHER_SOCKET.send(b'!/newfile\n')
+    GOPHER_SOCKET.close()
 
 class MillServicer(mill_pb2_grpc.MillServicer):
     def Turn(self, request, context):
