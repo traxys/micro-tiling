@@ -190,6 +190,10 @@ def interactive_mode(stdscr, code_name, input_name, mem_size, delay, mem_colors 
                 program.step()
             except EOFError:
                 return
+        stdscr.nodelay(1)
+        while stdscr.getch() != -1:
+            pass
+        stdscr.nodelay(0)
 
 mem_size = 65536
 delay = 0
