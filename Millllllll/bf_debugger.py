@@ -78,8 +78,24 @@ class Interpret:
     def set_input(self, string):
         self.input += string
 
-def interactive_mode(stdscr, code_name, input_name, mem_size, delay):
+def interactive_mode(stdscr, code_name, input_name, mem_size, delay, mem_colors = []):
     curses.curs_set(0)
+
+    curses.init_pair(1, curses.COLOR_RED, 0)
+    curses.init_pair(2, curses.COLOR_GREEN, 0)
+    curses.init_pair(3, curses.COLOR_BLUE, 0)
+    curses.init_pair(4, curses.COLOR_MAGENTA, 0)
+    curses.init_pair(5, curses.COLOR_CYAN, 0)
+    curses.init_pair(6, curses.COLOR_YELLOW, 0)
+
+    colors = {'w':curses.color_pair(0),
+              'r':curses.color_pair(1),
+              'g':curses.color_pair(2),
+              'b':curses.color_pair(3),
+              'm':curses.color_pair(4),
+              'c':curses.color_pair(5),
+              'y':curses.color_pair(6)}
+
     height, width = stdscr.getmaxyx()
     input_file = open(input_name)
     program = Interpret(code_name, mem_size, lambda : input_file.read(1))
@@ -108,30 +124,43 @@ def interactive_mode(stdscr, code_name, input_name, mem_size, delay):
         else:
             code_pad.addstr(l,0,line)
     
-    for k in range(mem_size):
-        l, c = divmod(k, mem_col)
-        c *= block_width +1
-        if k == program.head_pos:
-            mem_pad.addstr(l, c, hexa(program.data[k]), curses.A_REVERSE)
-        else:
-            mem_pad.addstr(l, c, hexa(program.data[k]))
+    def redraw_mem():
+        for k in range(mem_size):
+            l, c = divmod(k, mem_col)
+            c *= block_width +1
+            if k < len(mem_colors):
+                color = colors[mem_colors[k]]
+            else:
+                color = colors['w']
+            if k == program.head_pos:
+                mem_pad.addstr(l, c, hexa(program.data[k]), color + curses.A_REVERSE)
+            else:
+                mem_pad.addstr(l, c, hexa(program.data[k]), color)
     
+    redraw_mem()
+
     last_pos = program.pos[:]
     last_head_pos = program.head_pos
     while True:
         for k in [last_head_pos, program.head_pos]:
             l, c = divmod(k, mem_col)
-            c *= block_width +1
-            if k == program.head_pos:
-                mem_pad.addstr(l, c, hexa(program.data[k]), curses.A_REVERSE)
+            c *= block_width + 1
+            if k < len(mem_colors):
+                color = colors[mem_colors[k]]
             else:
-                mem_pad.addstr(l, c, hexa(program.data[k]))
+                color = colors['w']
+            if k == program.head_pos:
+                mem_pad.addstr(l, c, hexa(program.data[k]), color + curses.A_REVERSE)
+            else:
+                mem_pad.addstr(l, c, hexa(program.data[k]), color)
+
         code_pad.addstr(last_pos[0], last_pos[1], program.lines[last_pos[0]][last_pos[1]])
         code_pad.addstr(program.pos[0], program.pos[1], program.lines[program.pos[0]][program.pos[1]], curses.A_REVERSE)
         stdscr.refresh()
         code_pad_start_l = max(0, min(code_height-height, program.pos[0]-height//2))
         code_pad_start_c = max(0, min(code_width-width+mem_width, program.pos[1]-(width-mem_width)//2))
         code_pad.noutrefresh(code_pad_start_l,code_pad_start_c, 0,0, height-1, width-mem_width-1)
+
         mem_pad_start_l = max(0, min(mem_height-(height-terminal_height), program.head_pos//mem_col-(height-terminal_height)//2))
         mem_pad.noutrefresh(mem_pad_start_l,0, terminal_height, width-mem_width, height-1, width-1)
         curses.doupdate()
@@ -144,8 +173,18 @@ def interactive_mode(stdscr, code_name, input_name, mem_size, delay):
                 program.next_loop_start()
             except EOFError:
                 return
+            redraw_mem()
         elif k == "h":
             program.exit_loop()
+            redraw_mem()
+        elif k == "KEY_DOWN":
+            line = program.pos[0]
+            while program.pos[0] <= line:
+                try:
+                    program.step()
+                except EOFError:
+                    return
+            redraw_mem()
         else:
             try:
                 program.step()
@@ -154,4 +193,7 @@ def interactive_mode(stdscr, code_name, input_name, mem_size, delay):
 
 mem_size = 65536
 delay = 0
-curses.wrapper(interactive_mode, sys.argv[1], sys.argv[2], mem_size, delay)
+if len(sys.argv)>3:
+    curses.wrapper(interactive_mode, sys.argv[1], sys.argv[2], mem_size, delay, sys.argv[3].strip('\'"').split(' '))
+else:
+    curses.wrapper(interactive_mode, sys.argv[1], sys.argv[2], mem_size, delay)

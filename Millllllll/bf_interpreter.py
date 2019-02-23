@@ -1,6 +1,7 @@
 #! /usr/bin/python3
 import curses
 import sys
+import time
 from math import ceil
 
 
@@ -128,8 +129,7 @@ def interactive_mode(stdscr, file_name, mem_size, delay):
 
 
 if __name__ == "__main__":
-    import time
-    mem_size = 65536#1024
+    mem_size = 65536
     delay = 0
     if "-n" in sys.argv:
         i = sys.argv.index("-n")
