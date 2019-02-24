@@ -95,7 +95,7 @@ multiply by sqrt2/2*256*256%256
             [>]>[<<+
                 [>]>>[<<<+>>>>]<<<
             >>>>]<<<
-        <<]
+        <<<]
         <<<
     <]
     <
@@ -151,14 +151,14 @@ multiply by sqrt2/2*256
     <]
     <
 ]
-copy mult to x2/sqrt2
+copy mult to y2/sqrt2
 >>[->>>>>+<<<<<]
 
 
 <<<<
-copy x2 on cp1
+copy y2 on cp1
 [->>+>+<<<]>>>[-<<<+>>>]
-set x3/sqrt2 to 1 for carry checks
+set y3/sqrt2 to 1 for carry checks
 >>>>>>>+ >-< <<<<<<<
 multiply by sqrt2/2*256
 <[->
@@ -171,9 +171,9 @@ multiply by sqrt2/2*256
     <]
     <
 ]
-set x3/sqrt2 back to 0 (from 1)
+set y3/sqrt2 back to 0 (from 1)
 >>>>>>>>-<<<<<<<<
-copy mult to x2/sqrt2
+copy mult to y2/sqrt2
 >>[->>>>>>+<<<<<<]
 
 <<<
@@ -188,8 +188,7 @@ multiply by sqrt2/2*256
             [>]>[<<+
                 [>]>>[<<<+>>>>]<<<
             >>>>]<<<
-        <<]
-        <<<
+        <<<]<<<
     <]
     <
 ]
@@ -197,7 +196,7 @@ discard mult
 >>[-]
 
 
-copy x1 on cp1
+copy y1 on cp1
 <<<<<
 [->>>+>+<<<<]>>>>[-<<<<+>>>>]
 multiply by sqrt2/2*256*256%256
@@ -211,13 +210,13 @@ multiply by sqrt2/2*256*256%256
     <]
     <
 ]
-add mult to x3/sqrt2
+add mult to y3/sqrt2
 >>[->>>>>>+
     [>]>[<<+>>>>]<<<
 <<<<<<]
 
 <<<<
-copy x2 on cp1
+copy y2 on cp1
 [->>+>+<<<]>>>[-<<<+>>>]
 multiply by sqrt2/2*256*256%256
 <[->
@@ -227,7 +226,7 @@ multiply by sqrt2/2*256*256%256
             [>]>[<<+
                 [>]>>[<<<+>>>>]<<<
             >>>>]<<<
-        <<]
+        <<<]
         <<<
     <]
     <
@@ -235,7 +234,7 @@ multiply by sqrt2/2*256*256%256
 discard mult
 >>[-]
 
-copy x1 on cp1
+copy y1 on cp1
 <<<<<
 [->>>+>+<<<<]>>>>[-<<<<+>>>>]
 multiply by sqrt2/2*256*256*256%256

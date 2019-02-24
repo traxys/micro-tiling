@@ -5,8 +5,8 @@ import struct
 
 import subprocess
 
-n = 1000
-pi2 = 2*3.14159265358979323846264
+n = 100
+pi2 = 3.14159265358979323846264/2
 r2 = 2**.5/2
 points = [(sin(t*pi2/n), cos(t*pi2/n)) for t in range(n+1)]
 
@@ -28,6 +28,8 @@ after_rot = []
 for vect in points:
     p = subprocess.Popen(['bf', 'rotate.bf'], stdout = subprocess.PIPE, stdin = subprocess.PIPE)
     out, err = p.communicate(input=encode(vect))
+    if len(out) > 6:
+        print([encode(vect)])
     after_rot.append(decode(out))
 
 
@@ -37,7 +39,7 @@ def distance(p1, p2):
 def py_rotate(p):
     return (p[0]*r2-p[1]*r2, p[0]*r2+p[1]*r2)
 
-print([encode(points[i]) for i in range(n) if distance(py_rotate(points[i]), after_rot[i]) < 0.1])
+print([encode(points[i]) for i in range(n) if distance(py_rotate(points[i]), after_rot[i]) > 2.1])
 
 px = [p[0] for p in points]
 py = [p[1] for p in points]
