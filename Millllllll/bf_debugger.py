@@ -97,7 +97,7 @@ def interactive_mode(stdscr, code_name, input_name, mem_size, delay, mem_colors 
               'y':curses.color_pair(6)}
 
     height, width = stdscr.getmaxyx()
-    input_file = open(input_name)
+    input_file = open(input_name, 'rb')
     program = Interpret(code_name, mem_size, lambda : input_file.read(1))
     block_width = 2
     if width <= 2*block_width+2:
