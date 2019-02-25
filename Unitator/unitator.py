@@ -38,10 +38,13 @@ def send(data):
 def unit(segments, job_id):
     pass
 
-def write(text):
+def write(ip, job_id, text):
     subprocess.Popen('/usr/bin/kitty')
     sleep(3)
-    pyautogui.typewrite('vim text.why\n', interval=0.1)
+    pyautogui.typewrite('ssh ' + ip+'\n')
+    sleep(3)
+    pyautogui.hotkey('ctrl','d')
+    pyautogui.typewrite('vim ' + job_id + '\n', interval=0.1)
     sleep(1)
     pyautogui.typewrite('a')
     for line in text.split('\n'):
@@ -86,4 +89,4 @@ def listen():
                         "id": job_id
                     }))
                     unit(segments, job_id)
-write("XEEE\nDUUHODEUCO\nohedoe")
+write("localhost","uddu","XEEE\nDUUHODEUCO\nohedoe")
