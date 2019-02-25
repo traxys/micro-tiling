@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import socket
 import json
 import os
@@ -8,6 +9,8 @@ from time import sleep
 
 GOPHER_IP = '127.0.0.1'
 GOPHER_PORT = 3333
+
+SSH_HOST = "localhost"
 
 client = MatrixClient("http://localhost:8008")
 
@@ -38,10 +41,10 @@ def send(data):
 def unit(segments, job_id):
     pass
 
-def write(ip, job_id, text):
+def write(host, job_id, text):
     subprocess.Popen('/usr/bin/kitty')
     sleep(3)
-    pyautogui.typewrite('ssh ' + ip+'\n')
+    pyautogui.typewrite('ssh ' + host + '\n')
     sleep(3)
     pyautogui.hotkey('ctrl','d')
     pyautogui.typewrite('vim ' + job_id + '\n', interval=0.1)
@@ -89,4 +92,5 @@ def listen():
                         "id": job_id
                     }))
                     unit(segments, job_id)
-write("localhost","uddu","XEEE\nDUUHODEUCO\nohedoe")
+
+listen()
