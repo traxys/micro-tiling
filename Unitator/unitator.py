@@ -46,7 +46,7 @@ def write(host, job_id, text):
     sleep(3)
     pyautogui.typewrite('ssh ' + host + '\n')
     sleep(3)
-    pyautogui.hotkey('ctrl','d')
+    pyautogui.hotkey('ctrl', 'd')
     pyautogui.typewrite('vim ' + job_id + '\n', interval=0.1)
     sleep(1)
     pyautogui.typewrite('a')
@@ -77,7 +77,7 @@ def listen():
 
             for entry in entries.split('\n'):
                 if len(entry.split('\t')) < 2:
-                    pass
+                    continue
                 selector = entry.split('\t')[1]
                 if selector[0] == '0':
                     job_conn = send(selector.encode()+b'\n')
