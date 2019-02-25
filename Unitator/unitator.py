@@ -1,9 +1,16 @@
+#!/usr/bin/python
 import socket
 import json
+import os
+import pyautogui
+import subprocess
 from matrix_client.client import MatrixClient
+from time import sleep
 
 GOPHER_IP = '127.0.0.1'
 GOPHER_PORT = 3333
+
+SSH_HOST = "localhost"
 
 client = MatrixClient("http://localhost:8008")
 
@@ -34,13 +41,29 @@ def send(data):
 def unit(segments, job_id):
     pass
 
+def write(host, job_id, text):
+    subprocess.Popen('/usr/bin/kitty')
+    sleep(3)
+    pyautogui.typewrite('ssh ' + host + '\n')
+    sleep(3)
+    pyautogui.hotkey('ctrl', 'd')
+    pyautogui.typewrite('vim ' + job_id + '\n', interval=0.1)
+    sleep(1)
+    pyautogui.typewrite('a')
+    for line in text.split('\n'):
+        pyautogui.typewrite(line, interval=0.05)
+        pyautogui.press('enter')
+    pyautogui.press('esc')
+    pyautogui.typewrite(':x')
+    pyautogui.press('enter')
+
 def listen():
     notifier = socket.socket()
     notifier.bind((TCP_IP, TCP_PORT))
-    
+
     send(b'!/notify '
-           + (TCP_IP+':'+str(TCP_PORT)).encode()
-           + b'\n')
+         + (TCP_IP+':'+str(TCP_PORT)).encode()
+         + b'\n')
 
     notifier.listen()
     while True:
@@ -54,7 +77,7 @@ def listen():
 
             for entry in entries.split('\n'):
                 if len(entry.split('\t')) < 2:
-                    pass
+                    continue
                 selector = entry.split('\t')[1]
                 if selector[0] == '0':
                     job_conn = send(selector.encode()+b'\n')
@@ -69,4 +92,5 @@ def listen():
                         "id": job_id
                     }))
                     unit(segments, job_id)
+
 listen()
