@@ -5,8 +5,8 @@ import struct
 
 import subprocess
 
-n = 100
-pi2 = 3.14159265358979323846264/2
+n = 400
+pi2 = 3.14159265358979323846264*2
 r2 = 2**.5/2
 points = [(sin(t*pi2/n), cos(t*pi2/n)) for t in range(n+1)]
 
@@ -17,8 +17,8 @@ def encode(vect):
     return s
 
 def decode(s):
-    x = struct.unpack('>i', b'\x00'+s[:3])[0]/256./256
-    y = struct.unpack('>i', b'\x00'+s[3:6])[0]/256./256
+    x = struct.unpack('>i', s[:3]+b'\x00')[0]/256./256/256
+    y = struct.unpack('>i', s[3:6]+b'\x00')[0]/256./256/256
     return (x,y)
 
 
@@ -39,7 +39,6 @@ def distance(p1, p2):
 def py_rotate(p):
     return (p[0]*r2-p[1]*r2, p[0]*r2+p[1]*r2)
 
-print([encode(points[i]) for i in range(n) if distance(py_rotate(points[i]), after_rot[i]) > 2.1])
 
 px = [p[0] for p in points]
 py = [p[1] for p in points]
