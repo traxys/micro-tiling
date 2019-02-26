@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import pyinotify
 import json
 from matrix_client.client import MatrixClient
