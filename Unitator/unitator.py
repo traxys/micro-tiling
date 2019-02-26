@@ -11,6 +11,7 @@ GOPHER_IP = '127.0.0.1'
 GOPHER_PORT = 3333
 
 SSH_HOST = "localhost"
+SSH_DIR = "unitator_files"
 
 client = MatrixClient("http://localhost:8008")
 
@@ -39,14 +40,15 @@ def send(data):
     return gopher_conn
 
 def unit(segments, job_id):
-    pass
+    write(SSH_HOST, SSH_DIR, job_id, json.dumps(segments, indent=4))
 
-def write(host, job_id, text):
+def write(host, file_dir, job_id, text):
     subprocess.Popen('/usr/bin/kitty')
     sleep(3)
     pyautogui.typewrite('ssh ' + host + '\n')
     sleep(3)
     pyautogui.hotkey('ctrl', 'd')
+    pyautogui.hotkey("cd " + file_dir + '\n', interval=0.1)
     pyautogui.typewrite('vim ' + job_id + '\n', interval=0.1)
     sleep(1)
     pyautogui.typewrite('a')
@@ -56,6 +58,13 @@ def write(host, job_id, text):
     pyautogui.press('esc')
     pyautogui.typewrite(':x')
     pyautogui.press('enter')
+    pyautogui.typewrite("exit\n")
+    pyautogui.typewrite("exit\n")
+    room.send_text('@' + json.dumps({
+        "msg": "Wrote segments by ssh connection",
+        "service": "unitator",
+        "id": job_id
+    }))
 
 def listen():
     notifier = socket.socket()

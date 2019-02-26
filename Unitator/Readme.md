@@ -4,7 +4,7 @@ This service limits segments to the unit square
 ## Dependencies
 - Matrix SDK `pip install matrix_client`
 - PyAutoGUI `pip install PyAutoGUI`
-- Vim
+- Vim (Remote Host)
 - SSH
 
 ## Usage 
