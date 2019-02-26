@@ -48,7 +48,7 @@ def write(host, file_dir, job_id, text):
     pyautogui.typewrite('ssh ' + host + '\n')
     sleep(3)
     pyautogui.hotkey('ctrl', 'd')
-    pyautogui.hotkey("cd " + file_dir + '\n', interval=0.1)
+    pyautogui.typewrite("cd " + file_dir + '\n', interval=0.1)
     pyautogui.typewrite('vim ' + job_id + '\n', interval=0.1)
     sleep(1)
     pyautogui.typewrite('a')
