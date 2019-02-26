@@ -1,7 +1,5 @@
 [Unit]
-Requires=golfer.service
-After=golfer.service
-Description=Unitator
+Description=Translator
 
 [Service]
 ExecStart=<PATH>/micro-tiling/Translator/translator.py
