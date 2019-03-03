@@ -1,2 +1,41 @@
 version: '3'
 services:
+  synapse:
+     image: matrixdotorg/synapse:latest
+     restart: unless-stopped
+     environment:
+       - SYNAPSE_SERVER_NAME=ZeMatrix
+       - SYNAPSE_REPORT_STATS=no
+       - SYNAPSE_ENABLE_REGISTRATION=yes
+       - SYNAPSE_LOG_LEVEL=INFO
+       - SYNAPSE_NO_TLS=1
+       - POSTGRES_HOST=synapse_db
+       - POSTGRES_DB=synapse
+       - POSTGRES_USER=synapse
+       - POSTGRES_PASSWORD=synapse
+     depends_on:
+       - synapse_db
+     volumes:
+       - ./synapse_data:/data
+     ports:
+       - 8008:8008
+  synapse_db:
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=synapse
+      - POSTGRES_USER=synapse
+      - POSTGRES_PASSWORD=synapse
+      - ./synapse_schemas:/var/lib/postgresql/data
+  a_pi:
+    build: ./a_pi
+    restart: unless-stopped
+    environment:
+      - MATRIX_HOST=synapse
+      - MATRIX_PORT=8008
+      - MILLLLLLLL_HOST=
+      - MILLLLLLLL_PORT=
+    depends_on:
+      - synapse
+    ports:
+      - 4242:80
