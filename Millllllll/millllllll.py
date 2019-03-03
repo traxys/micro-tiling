@@ -33,7 +33,7 @@ def write(job):
     f.close()
     GOPHER_SOCKET = \
         socket.create_connection((GOPHER_IP, GOPHER_PORT))
-    GOPHER_SOCKET.send(b'!/newfile\n')
+    GOPHER_SOCKET.send(b'!/newfile' + job.id.id +'\n')
     GOPHER_SOCKET.close()
 
 class MillServicer(mill_pb2_grpc.MillServicer):

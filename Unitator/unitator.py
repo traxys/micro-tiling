@@ -78,28 +78,32 @@ def listen():
     while True:
         conn, _ = notifier.accept()
         data = conn.recv(19)
-        conn.close()
         if data == b'pssssst want some ?':
+            data = b""
+            while True:
+                new_data = conn.recv(1)
+                if not new_data or new_data == b'#':
+                    break
+                data += new_data
+            data = data.decode()
+            conn.close()
+            data = data.split('|')
+            
+            if len(data) == 2:
+                host = data[0]
+                job_selector = data[1]
 
-            conn = send(b'\n')
-            entries = recv_data(conn)
+                job_conn = send(job_selector.encode()+b'\n')
+                segments = json.loads(recv_data(job_conn))
 
-            for entry in entries.split('\n'):
-                if len(entry.split('\t')) < 2:
-                    continue
-                selector = entry.split('\t')[1]
-                if selector[0] == '0':
-                    job_conn = send(selector.encode()+b'\n')
-                    segments = json.loads(recv_data(job_conn))
+                send(b'!/delete '+selector.encode()+b'\n')
 
-                    send(b'!/delete '+selector.encode()+b'\n')
-
-                    job_id = selector.split("/")[1]
-                    room.send_text('@' + json.dumps({
-                        "msg": "Fetched segments",
-                        "service": "unitator",
-                        "id": job_id
-                    }))
-                    unit(segments, job_id)
+                job_id = selector.split("/")[1]
+                room.send_text('@' + json.dumps({
+                    "msg": "Fetched segments",
+                    "service": "unitator",
+                    "id": job_id
+                }))
+                unit(segments, job_id)
 
 listen()
