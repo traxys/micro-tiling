@@ -32,6 +32,7 @@ def recv_data(conn):
         if not new_data:
             break
         data += new_data.decode()
+    print(data)
     return data
 
 def send(data):
@@ -47,7 +48,7 @@ def write(host, file_dir, job_id, text):
     sleep(3)
     pyautogui.typewrite('ssh ' + host + '\n')
     sleep(3)
-    pyautogui.hotkey('ctrl', 'd')
+    #pyautogui.hotkey('ctrl', 'd')
     pyautogui.typewrite("cd " + file_dir + '\n', interval=0.1)
     pyautogui.typewrite('vim ' + job_id + '\n', interval=0.1)
     sleep(1)
@@ -85,9 +86,11 @@ def listen():
                 if not new_data or new_data == b'#':
                     break
                 data += new_data
-            data = data.decode()
             conn.close()
+            
+            data = data.decode()
             data = data.split('|')
+            print(data)
             
             if len(data) == 2:
                 host = data[0]
@@ -96,9 +99,9 @@ def listen():
                 job_conn = send(job_selector.encode()+b'\n')
                 segments = json.loads(recv_data(job_conn))
 
-                send(b'!/delete '+selector.encode()+b'\n')
+                send(b'!/delete '+job_selector.encode()+b'\n')
 
-                job_id = selector.split("/")[1]
+                job_id = job_selector.split("/")[1]
                 room.send_text('@' + json.dumps({
                     "msg": "Fetched segments",
                     "service": "unitator",
