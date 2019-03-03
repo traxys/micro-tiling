@@ -1,5 +1,4 @@
 #! /usr/bin/python3
-import curses
 import sys
 import time
 
@@ -7,37 +6,35 @@ import time
 class Interpret:
     def __init__(self, file_name, mem_size = 65536, get_input = lambda: sys.stdin.read(1)):
         f = open(file_name, "r")
-        self.lines = [line for line in f.read()]
-        self.pos = [0,0]#line, column
+        self.code = [c for c in f.read() if c in '[]+-<>,.']
+        self.pos = 0
         self.loop_starts = []
         self.data = bytearray(mem_size)
         self.head_pos = 0
         self.mem_size = mem_size
         self.out = b""
         self.get_input = get_input
-        self.correct_pos()
-    def correct_pos(self):
-        while self.pos[1]>=len(self.lines[self.pos[0]]):
-            self.pos = [self.pos[0]+1, self.pos[1]-len(self.lines[self.pos[0]])]
-            if self.pos[0]>=len(self.lines):
-                raise EOFError()
+
+    def next_char(self):
+        self.pos += 1
+        if self.pos >= len(self.code):
+            raise EOFError
     def step(self):
-        char = self.lines[self.pos[0]][self.pos[1]]
+        char = self.code[self.pos]
         if char == '[':
             if self.data[self.head_pos]:
-                self.loop_starts.append(self.pos[:])
+                self.loop_starts.append(self.pos)
             else:
                 depth = 1
                 while depth > 0:
-                    self.pos[1] += 1
-                    self.correct_pos()
-                    if self.lines[self.pos[0]][self.pos[1]] == "[":
+                    self.next_char()
+                    if self.code[self.pos] == "[":
                         depth += 1
-                    if self.lines[self.pos[0]][self.pos[1]] == "]":
+                    if self.code[self.pos] == "]":
                         depth -= 1
         if char == ']':
             if self.data[self.head_pos]:
-                self.pos = self.loop_starts[-1][:]
+                self.pos = self.loop_starts[-1]
             else:
                 self.loop_starts.pop(-1)
         if char == '>':
@@ -54,8 +51,7 @@ class Interpret:
             self.out += bytes([self.data[self.head_pos]])
         if char == ',':
             self.data[self.head_pos] = ord(self.get_input())
-        self.pos[1] += 1
-        self.correct_pos()
+        self.next_char()
     def get_output(self, size = 0):
         if size <= 0:
             out = self.out
