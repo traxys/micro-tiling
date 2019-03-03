@@ -19,6 +19,7 @@ class Interpret:
         self.pos += 1
         if self.pos >= len(self.code):
             raise EOFError
+
     def step(self):
         char = self.code[self.pos]
         if char == '[':
@@ -52,6 +53,7 @@ class Interpret:
         if char == ',':
             self.data[self.head_pos] = ord(self.get_input())
         self.next_char()
+
     def get_output(self, size = 0):
         if size <= 0:
             out = self.out
@@ -71,6 +73,7 @@ class Interpret:
             out = self.out
             self.out = b""
             return out
+
     def set_input(self, string):
         self.input += string
 
@@ -81,6 +84,7 @@ if __name__ == "__main__":
         i = sys.argv.index("-n")
         mem_size = int(sys.argv.pop(i+1))
         sys.argv.pop(i)
+
     try:
         file_name = sys.argv[1]
     except IndexError:
@@ -89,6 +93,7 @@ if __name__ == "__main__":
         print('options :')
         print('-n (number)  -> set memory size')
         raise
+
     program = Interpret(file_name, mem_size)
     while True:
         try:
