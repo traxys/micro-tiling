@@ -1,7 +1,0 @@
-#! /bin/sh
-
-set -e
-
-if [ -x "/etc/init.d/gofish" ]; then
-	/etc/init.d/gofish stop
-fi

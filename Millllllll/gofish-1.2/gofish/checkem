@@ -1,5 +1,0 @@
-#!/bin/sh
-
-for f in *.[ch]; do
-	checkpatch --file $f | fgrep -q "no obvious style problems" || echo "$f"
-done
