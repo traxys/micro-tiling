@@ -57,7 +57,7 @@ fonctionnement de la rotation :
         Comme on termine et commence sur la premiere case mémoire la boucle continuera d'etre interprétée jusqu'a ce que la premiere case mémoire soit mise à 0
         vous aurez aussi pu noter que (comme la plupart des opérations simples en brainfuck) cette opération a détruit une partie des variables (ici seulement x)
     
-    Mais toute la difficulté de ce programme vient du fait que l'on veut faire des multiplications sur plusieurs octets.
+    Mais toute la difficulté de ce programme vient du fait que l'on veuille faire des multiplications sur plusieurs octets.
     Il faut donc être capable de transmettre les retenues.
     Pour cela, il suffit de tester ici V si la valeur de la variable de sortie est nulle et dans ce cas transmettre la retenue dans une autre variable.
                              [-> [->+>+ <<] > [-<+>] < <]
@@ -84,11 +84,11 @@ fonctionnement de la rotation :
             # x*y%256 1 0 0 carry
             #         T   F
             [>>>+<]
-            # x*y%256 1 0 0 carry
+            # x*y%256 1 0 0 carry(+1 si T)
             #             A
             # à cette étape on a ajouté 1 à la retenue si x*y%256 vallait 0
             <<<
-            # x*y%256 1 0 0 carry
+            # x*y%256 1 0 0 carry(+1 si T)
             # AAAAAAA
         Dans tous les cas on est revenu au point de départ
     Cette solution à l'avantage de ne pas détruire x*y%256 et d'etre rapide d'execution.
@@ -105,6 +105,8 @@ fonctionnement de la rotation :
         on multiplie y par sqrt(2)/2
         on le soustrait à xout et on l'ajoute à yout
         on écrit xout et yout en sortie
+    lors des multiplications, comme on multiplie par une constante, la constante est notée sous forme d'une suite de + et n'a donc pas besoin d'être copiée à chaque étape de la multiplication, juste réécrite.
+    les constantes sont les octets après la virgule de sqrt(2)/2.
 
 ]
 
