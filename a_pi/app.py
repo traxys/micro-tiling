@@ -113,7 +113,8 @@ def terminate(db, job_id, mill_stub):
             id=mill_pb2.JobId(
                 id=job_id),
             amount=8,
-            segments=segments
+            segments=segments,
+            result=segments
     ))
     
     db.execute(
