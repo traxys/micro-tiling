@@ -1,0 +1,9 @@
+#! /bin/sh
+
+set -e
+
+deluser gopher || true
+
+if [ "$1" = "purge" ] ; then
+	update-rc.d gofish remove >/dev/null
+fi

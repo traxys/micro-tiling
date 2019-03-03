@@ -1,0 +1,12 @@
+#! /bin/sh
+
+set -e
+
+adduser --system --ingroup nogroup --home /var/gopher \
+	--shell /bin/false --disabled-login gopher >/dev/null 2>&1 || true
+[ -d /var/gopher ] || mkdir -p /var/gopher
+
+if [ -x "/etc/init.d/gofish" ]; then
+	update-rc.d gofish defaults >/dev/null
+	/etc/init.d/gofish start
+fi

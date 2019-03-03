@@ -1,0 +1,15 @@
+Source: gofish
+Section: net
+Priority: optional
+Maintainer: Gergely Nagy <algernon@bonehunter.rulez.org>
+Standards-Version: 3.5.7
+
+Package: gofish
+Architecture: any
+Depends: ${shlibs:Depends}, adduser (>= 3.34)
+Provides: gopher-server
+Description: A simple Gopher server.
+ GoFish is a simple gopher / web server. It is designed with security
+ and low resource usage in mind. GoFish uses a single process that
+ handles all the connections. This provides low resource usage, good
+ latency (no context switches), and good scalability.

@@ -1,0 +1,26 @@
+Thy was debianised by Gergely Nagy <algernon@bonehunter.rulez.org>.
+
+It was downloaded from
+	http://gofish.sourceforge.net/
+
+Upstream Author: Sean MacLennan <seanm@seanm.ca>
+
+Copyright:
+
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; version 2 dated June,
+   1991.
+
+   This program is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this package; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+   02111-1307, USA.
+
+On Debian systems, the complete text of the GNU General Public License
+can be found in `/usr/share/common-licenses/GPL'.

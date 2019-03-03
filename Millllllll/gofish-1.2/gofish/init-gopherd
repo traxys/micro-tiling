@@ -1,0 +1,48 @@
+#!/bin/bash
+# The following two lines enable chkconfig(1) to manipulate this script
+# chkconfig: 2345 99 01
+# description: control of GoFish gopher daemon
+# modified from Jef Poskanzer's tiny/turbo/throttling http daemon
+
+# source function library
+. /etc/rc.d/init.d/functions
+
+pidfile=/var/run/gopherd.pid
+pid=`cat $pidfile 2>/dev/null`
+
+if test -n "$pid" && kill -0 $pid 2>/dev/null; then
+	dead=no
+else
+	dead=yes
+fi
+
+die(){
+	echo -n "$*"; echo_failure; echo ''
+	exit 1;
+}
+
+case "$1" in
+ start)	test "$dead" = yes || die gopherd is already running
+	echo -n "Starting gopherd: "
+	daemon /usr/sbin/gopherd -d
+	touch /var/lock/subsys/gopherd
+	echo_success;echo ''
+	exit 0
+	;;
+  stop)	echo -n "Stopping gopherd: "
+	signal=HUP
+	;;
+  kill)	echo -n "Violently killing gopherd: "
+	signal=KILL
+	;;
+status)	status gopherd; exit $?;;
+restart) $0 stop; sleep 2; exec $0 start;;
+     *)	die "Usage: gopherd {start|stop|restart|status}";;
+esac
+
+test "$dead" = no || die gopherd is not running
+kill -$signal $pid
+sleep 2
+kill -0 $pid 2>/dev/null && die "gopherd[$pid] will not die"
+rm -f /var/lock/subsys/gopherd
+echo_success; echo ''

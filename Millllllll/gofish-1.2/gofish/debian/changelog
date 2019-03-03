@@ -1,0 +1,12 @@
+gofish (0.26-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Fri,  3 Jan 2003 12:39:40 +0100
+
+gofish (0.23-1) unstable; urgency=low
+
+  * The `Welcome to my Land' release.
+  * Initial upload to Debian (Closes: #169089).
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Thu, 14 Nov 2002 13:30:16 +0100

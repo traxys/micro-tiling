@@ -1,0 +1,11 @@
+#!/bin/sh
+
+cd /var/gopher
+
+for cache in `find . -name .cache`; do
+  for f in `grep -v "^[19].*$" $cache | cut -f2 | cut -c3-`; do
+    [ -r $f ] || echo "$f: ERROR: file does not exist or is not readable"
+    grep "^\.$" $f > /dev/null
+    [ $? -eq 0 ] && echo "$f: ERROR: . on line by itself"
+  done
+done

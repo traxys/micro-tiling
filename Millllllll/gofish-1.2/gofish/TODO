@@ -1,0 +1,38 @@
+TODO
+----
+
+- /new and /new/ as different entries
+
+- more configuration
+  - http error msgs
+  - html header/footer
+
+- persistent http connections
+  - would have to timeout connections
+
+- convert log hits to use write calls
+- flock to logging so mulitple progs can log to the same file
+
+- clean the close_connect/log path
+  - multiple checks for \r\n
+  - multiple checks for GET/HEAD
+
+- gopher errors should work like http errors?
+
+- get rid of conn->http
+  - http-server config option?
+
+
+DOCUMENTATION
+-------------
+
+- doc combined versus common
+
+- doc fast vs simple urls
+
+- doc http
+
+- doc mmap_cache
+  - mmap_cache_size
+
+- added argv[0] to set syslog name

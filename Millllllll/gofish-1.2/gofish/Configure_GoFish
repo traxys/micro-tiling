@@ -1,0 +1,99 @@
+		 Welcome to the GoFish Gopher Server!
+		 ------------------------------------
+
+This file is a roadmap of how to add content to your shiny new gopher
+server. Most of the real documentation is in the form of man pages
+which where provided as part of the GoFish package.
+
+For the really impatient:
+
+    1) Add some files and/or directories to /var/gopher
+    2) Run `mkcache -r'
+    3) Sit back and wait for the hits
+
+
+			      The Basics
+			      ----------
+
+The Gopher spec is defined in RFC 1436 "Internet Gopher Protocol" (see
+Links below).  The important thing to remember is that gopher is ment
+to share files. It uses a directory structure to layout the files. The
+root directory is the base directory that all files descend from. In
+GoFish the root directory defaults to /var/gopher.
+
+GoFish requires a special file called ".cache" in each directory you
+want to serve files from. There is a man page provided with GoFish on
+the format of the .cache file. To see it "man dotcache".
+
+A program is provided with GoFish that will produce the .cache
+files. The description of the file will just be the file name
+itself. mkcache can recursively create all the cache files in the root
+directory structure. Warning: mkcache will overwrite all the .cache
+files in your gopher directories. See "man mkcache" for more
+information on mkcache.
+
+Why is it called .cache? The original gopher servers produced their
+directory menus dynamically. Since directory menu hits where
+expensive, the servers cached preprocessed output in .cache files I
+decided to keep the name, even though they are not created
+dynamically.
+
+
+
+			    Configuration
+			    -------------
+
+All GoFish configuration can be set at compile time. In this case, no
+cofiguration file is necessary. However, a configuration file can be
+used to tweak the default configuration. The configuration file is
+documented in a man page. Type "man 5 gofish".
+
+There is one entry you will probably have to configure, and that is
+the host name. The hostname can be set at compile time, or it will
+choose your current hostname. If you are on a lan, you are probably
+ok. But on the net, you will probably have to tweak it.
+
+
+			      Gophermaps
+			      ----------
+
+Gophermaps are  a simpler way of defining  .cache files.   If you have
+been running Bucktooth  or some other  server that supports gophermaps
+(or just   like gophermaps), GoFish  has  a gophermap to   .cache file
+conversion program.  'gmap2cache' works much  like 'mkcache' except it
+reads the gophermap file instead of the directory.  It has a man page,
+"man gmap2cache".
+
+
+			  A Note About URLs
+			  -----------------
+
+Gopher urls have the type embedded in them. For example:
+gopher://seanm.ca/1/rfc. The 1 specifies that the file is a
+directory. However, most browsers put the type from the description
+and the type from the selector togeather. They then strip the first
+one off when sending to the gopher server. So, to specify the above
+URL in Netscape, you would use gopher://seanm.ca/11/rfc.
+
+
+		 A Note on the Gopher to HTTP Gateway
+		 ------------------------------------
+
+For the gopher impaired, by default GoFish supports serving the gopher
+files via http protocol. Directory menus and plain text files are
+converted to html. In the case of text files, they are just centered
+and sent within <pre></pre> tags.
+
+To access a file via http, just add the port number. For example:
+<http://seanm.ca:70/1/rfc>.
+
+
+				Links
+				-----
+
+GoFish		http://gofish.sourceforge.net/
+
+RFC 1436	gopher://seanm.ca/00/rfc/rfc1436.txt
+		http://seanm.ca:70/00/rfc/rfc1436.txt
+
+Gophermaps	gopher://gopher.floodgap.com/1/buck

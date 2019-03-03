@@ -1,0 +1,45 @@
+.TH GOPHERD "1" "August 2002" "gopherd" "GoFish"
+.SH NAME
+gopherd \- the GoFish gopher server
+.SH SYNOPSIS
+.B gopherd
+[\fI\-dp\fR] [\fI\-v\fR] [\fIconfig_file\fR]
+.SH DESCRIPTION
+.PP
+GoFish is a very simple gopher server. It is designed with security
+and low resource usage in mind. GoFish uses a single process that
+handles all the connections. This provides low resource usage, good
+latency (no context switches), and good scalability.
+.PP
+GoFish runs in a
+.BR chroot (2)
+environment. This means that GoFish can only serve
+files from the root directory or below. While GoFish must run at root
+privilege to be able to use port 70, it drops to a normal user while
+accessing files.
+.SH OPTIONS
+.TP
+\fB\-d\fR
+daemon mode
+.TP
+\fB\-p\fR
+preprocess cache
+.TP
+\fB\-v\fR
+increase verbosity
+.SH FILES
+/etc/gofish.conf
+.SH "SEE ALSO"
+.BR gofish (5),
+.BR dotcache (5),
+.BR mkcache (1),
+Internet RFC 1436
+.SH AUTHOR
+Written by Sean MacLennan
+.SH "REPORTING BUGS"
+Report bugs to <headgopher@seanm.ca>.
+.SH COPYRIGHT
+Copyright \(co 2002 Sean MacLennan
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

@@ -1,0 +1,17 @@
+#!/bin/sh
+
+cd /var/gopher/log
+
+[ -f gopherd.log.16 ] && { echo "Warning deleting gopherd.log.16"; rm gopherd.log.16; }
+
+for i in 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1; do
+	from=gopherd.log.$i
+	[ -f $from ] || continue
+	to=gopherd.log.`expr $i + 1`
+
+	mv $from $to
+done
+
+mv gopherd.log gopherd.log.1
+
+kill -USR1 `cat /var/run/gopherd.pid`

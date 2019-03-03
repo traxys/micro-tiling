@@ -1,0 +1,48 @@
+.TH MKCACHE "1" "August 2002" "mkcache" "GoFish"
+.SH NAME
+mkcache \- produce .cache files for GoFish
+.SH SYNOPSIS
+.B mkcache
+[\fI\-c config\fR] [\fI\-rv\fR] [\-s sorttype] [\fIdirectory\fR]
+.SH DESCRIPTION
+.PP
+mkcache automatically generates .cache files for the GoFish gopher
+server based on the files in the directories.
+.PP
+Because all files are specified relative to the gopher root directory,
+it is very important that the root directory is set correctly. mkcache
+reads the same configuration file used by GoFish.
+.PP
+The directory to process defaults to the root directory.  If you
+explicitly set
+.B directory,
+it must be a subdirectory of the root directory.
+.PP
+.SH WARNING
+mkcache will overwrite all existing .cache files.
+.SH OPTIONS
+.TP
+\fB\-c\fR {config}
+set the config file to read
+.TP
+\fB\-r\fR
+recurse into directories
+.TP
+\fB\-s n\fR
+sort type. 0 = simple, 1 = dirs first, 2 = dirs then filetype
+.TP
+\fB\-v\fR
+increase verbosity
+.SH "SEE ALSO"
+.BR gofish (1),
+.BR gofish (5),
+.BR dotcache (5)
+.SH AUTHOR
+Written by Sean MacLennan
+.SH "REPORTING BUGS"
+Report bugs to <headgopher@seanm.ca>.
+.SH COPYRIGHT
+Copyright \(co 2002-2008 Sean MacLennan
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

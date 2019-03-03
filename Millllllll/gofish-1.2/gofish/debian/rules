@@ -1,0 +1,98 @@
+#! /usr/bin/make -f
+## Written by Gergely Nagy <algernon@debian.org>
+## This is under GPL v2.
+
+PACKAGE		 = gofish
+PKGDIR		 = ${CURDIR}/debian/${PACKAGE}
+
+CFLAGS		?= -g
+BGT		:= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+HGT		:= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+
+ifneq (,$(findstring noopt,${DEB_BUILD_OPTIONS}))
+CFLAGS		+= -O0
+else
+CFLAGS		+= -O2
+endif
+
+config.status: configure
+	test -e debian/control
+	CFLAGS="${CFLAGS}" ./configure --prefix=/usr --sysconfdir=/etc \
+				       --mandir=/usr/share/man \
+				       --localstatedir=/var \
+				       --build=${BGT} --host=${HGT} \
+				       ${CONFIG_FLAGS}
+
+build: config.status
+	test -e debian/control
+	${MAKE}
+
+clean:
+	test -e debian/control && test xroot = x`whoami`
+	rm -rf debian/${PACKAGE}.substvars ${PKGDIR} debian/files
+	-${MAKE} distclean
+	rm -rf ${PKGDIR}
+
+install: build
+	test -e debian/control && test "x`whoami`" = "xroot"
+	rm -rf ${PKGDIR}
+	install -d ${PKGDIR}/etc/init.d ${PKGDIR}/var/gopher \
+		${PKGDIR}/usr/share/doc/${PACKAGE}
+	${MAKE} install DESTDIR=${PKGDIR}
+## Clean up after install...
+	rm -rf  ${PKGDIR}/var/gopher/.gopher+ \
+		${PKGDIR}/usr/sbin/gopherd \
+		${PKGDIR}/usr/share/man/man1/gopherd.1
+	install -m 0755 debian/maint/gofish ${PKGDIR}/etc/init.d/
+	install -m 0644 Configure_GoFish README TODO \
+		${PKGDIR}/usr/share/doc/${PACKAGE}/
+
+binary-gofish: install
+	test -e debian/control && test "x`whoami`" = "xroot"
+## Install debian-specific stuff
+# ..the changelogs..
+	gzip -9fc ChangeLog >${PKGDIR}/usr/share/doc/${PACKAGE}/changelog.gz
+	gzip -9fc debian/changelog >${PKGDIR}/usr/share/doc/${PACKAGE}/changelog.Debian.gz
+# ..the copyright file..
+	install -m 0644 debian/copyright ${PKGDIR}/usr/share/doc/${PACKAGE}
+## Gzip manual pages and info docs...
+	gzip -9f ${PKGDIR}/usr/share/man/man1/* \
+		 ${PKGDIR}/usr/share/man/man5/*
+## Strip binaries
+ifeq (,$(findstring nostrip,${DEB_BUILD_OPTIONS}))
+	strip --remove-section=.comment --remove-section=.note \
+		${PKGDIR}/usr/sbin/gofish ${PKGDIR}/usr/bin/gmap2cache \
+		${PKGDIR}/usr/bin/mkcache
+endif
+## Fix permissions
+	find ${PKGDIR} -print0 2>/dev/null | xargs -0r chown \
+						   --no-dereference 0.0
+	find ${PKGDIR} ! -type l -print 0 2>/dev/null | xargs -0r \
+		chmod go=rX,u+rw,a-s
+## Generate ${shlibs:Depends}
+	dpkg-shlibdeps -Tdebian/${PACKAGE}.substvars -dDepends \
+			${PKGDIR}/usr/sbin/gofish \
+			${PKGDIR}/usr/bin/gmap2cache \
+			${PKGDIR}/usr/bin/mkcache
+## Install stuff to DEBIAN/
+	install -d ${PKGDIR}/DEBIAN
+	install -m 0755 debian/maint/postinst debian/maint/postrm \
+			debian/maint/prerm ${PKGDIR}/DEBIAN/
+	cd ${PKGDIR} >/dev/null ;\
+	 find etc -type f -printf "/%p\n" >DEBIAN/conffiles
+## Generate DEBIAN/md5sums
+	cd ${PKGDIR} >/dev/null ;\
+	 find * -type f ! -regex '^DEBIAN/.*' -print0 | xargs -r0 md5sum > DEBIAN/md5sums
+## Generate DEBIAN/control
+	dpkg-gencontrol -isp -p${PACKAGE} -Tdebian/${PACKAGE}.substvars \
+			-P${PKGDIR}
+## Build the binary package
+	dpkg --build ${PKGDIR} ..
+
+binary-indep:
+binary-arch: binary-gofish
+
+binary: binary-indep binary-arch
+
+.PHONY: binary binary-arch binary-indep clean build install binary-gofish
+.SUFFIXES:
