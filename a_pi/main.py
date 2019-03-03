@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import sqlite3
 import random
 import string
@@ -15,10 +18,12 @@ import mill_pb2
 import mill_pb2_grpc
 
 from matrix_client.client import MatrixClient
-client = MatrixClient("http://localhost:8008")
+client = MatrixClient('http://{}:{}'.format(os.environ['MATRIX_HOST'], os.environ['MATRIX_PORT']))
+
+print(os.environ['MATRIX_HOST'])
 
 import json
-matrix_param_file = open("../matrix_user.json","r")
+matrix_param_file = open("matrix_user.json", "r")
 matrix_param = json.loads(matrix_param_file.read())
 matrix_param_file.close()
 
@@ -26,7 +31,7 @@ token = client.login(username=matrix_param["username"], password=matrix_param["p
 room = client.join_room(matrix_param["room"]);
 
 MAX_PI = 1000
-MILLLLLLLL_ADDR = '127.0.0.1:5001'
+MILLLLLLLL_ADDR = os.environ['MILLLLLLLL_HOST'] + ':' + os.environ['MILLLLLLLL_PORT']
 
 def get_db():
     if 'db' not in g:
@@ -128,6 +133,8 @@ def terminate(db, job_id, mill_stub):
         (job_id,)
     )
     db.commit()
+
+
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
@@ -158,6 +165,7 @@ def create_app(test_config=None):
     def hello():
         valid = [str(i) for i in range(0, 10)]
         valid.append('π')
+        
         if request.method == 'POST':
             digit = request.form['digit']
             job = request.form['job']
@@ -207,4 +215,4 @@ def create_app(test_config=None):
 
     return app
 
-#create_app()
+app = create_app()
