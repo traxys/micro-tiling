@@ -56,6 +56,7 @@ def remove_deg_1(points):
         p.linked[0].linked.remove(p)
         if len(p.linked[0].linked) == 1:
             deg1.append(p.linked[0])
+        p.linked = []
 
     return [p for p in points if len(p.linked)>1]
 
