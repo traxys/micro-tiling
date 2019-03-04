@@ -59,7 +59,7 @@ def main():
                             notifier.send(b"pssssst want some ?" + 
                                           TCP_IP.encode() + 
                                           b"|0/" + 
-                                          file_name.encode() + 
+                                          data[1].encode() + 
                                           b"#") 
                             notifier.close()
                         except ConnectionRefusedError:

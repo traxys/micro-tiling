@@ -1,5 +1,7 @@
+#!/usr/bin/python
 import pyinotify
 import json
+import os
 from matrix_client.client import MatrixClient
 
 def get_room():
@@ -32,6 +34,7 @@ def listen():
             segments = json.loads(segment_file.read())
             segment_file.close()
             translation(segments, event.name)
+            os.remove(event.pathname)
 
     handler = EventHandler()
     notifier = pyinotify.Notifier(wm, handler)
