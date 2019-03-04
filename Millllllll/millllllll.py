@@ -7,6 +7,7 @@ import mill_pb2_grpc
 import socket
 import json
 from matrix_client.client import MatrixClient
+from google.protobuf.json_format import MessageToDict
 
 GOPHER_PATH = '../gopher/files/'
 GOPHER_IP = '127.0.0.1'
@@ -21,15 +22,14 @@ matrix_param_file.close()
 token = client.login(username=matrix_param["username"], password=matrix_param["password"])
 room = client.join_room(matrix_param["room"]);
 
-def write(job):
+def write(job, job_id):
     room.send_text('@' + json.dumps({
         "msg": "Wrote to gopher server",
         "service": "millllllll",
-        "id": job.id.id
+        "id": job_id
     }))
     f = open(GOPHER_PATH + job.id.id, 'w')
-    print(list(job.result))
-    f.write(json.dumps(list(job.result)))
+    f.write(job)
     f.close()
     GOPHER_SOCKET = \
         socket.create_connection((GOPHER_IP, GOPHER_PORT))
@@ -38,7 +38,7 @@ def write(job):
 
 class MillServicer(mill_pb2_grpc.MillServicer):
     def Turn(self, request, context):
-        write(request)
+        #write(request)
         room.send_text('@' + json.dumps({
             "msg": "Turned segments",
             "service": "millllllll",
