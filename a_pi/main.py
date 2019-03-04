@@ -17,19 +17,6 @@ import grpc
 import mill_pb2
 import mill_pb2_grpc
 
-from matrix_client.client import MatrixClient
-client = MatrixClient('http://{}:{}'.format(os.environ['MATRIX_HOST'], os.environ['MATRIX_PORT']))
-
-print(os.environ['MATRIX_HOST'])
-
-import json
-matrix_param_file = open("matrix_user.json", "r")
-matrix_param = json.loads(matrix_param_file.read())
-matrix_param_file.close()
-
-token = client.login(username=matrix_param["username"], password=matrix_param["password"])
-room = client.join_room(matrix_param["room"]);
-
 MAX_PI = 1000
 MILLLLLLLL_ADDR = os.environ['MILLLLLLLL_HOST'] + ':' + os.environ['MILLLLLLLL_PORT']
 
@@ -65,7 +52,7 @@ def init_db_command():
 def init_app(app):
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
-    
+
 def make_pi(total):
     q, r, t, k, m, x = 1, 0, 1, 1, 3, 3
     count = 0
@@ -107,11 +94,6 @@ def terminate(db, job_id, mill_stub):
                     b=mill_pb2.Point(
                         x=s['x2'],
                         y=s['x2'])) for s in segments]
-    
-    room.send_text('@'+json.dumps({
-        "msg": "Sent segments to mill",
-        "service": "a_pi",
-        "id": job_id}))
 
     mill_stub.Turn(
         mill_pb2.Job(
@@ -121,7 +103,7 @@ def terminate(db, job_id, mill_stub):
             segments=segments,
             result=segments
     ))
-    
+
     db.execute(
         'DELETE FROM job'
         ' WHERE id = ?',
@@ -165,7 +147,7 @@ def create_app(test_config=None):
     def hello():
         valid = [str(i) for i in range(0, 10)]
         valid.append('π')
-        
+
         if request.method == 'POST':
             digit = request.form['digit']
             job = request.form['job']
@@ -175,11 +157,11 @@ def create_app(test_config=None):
                 'SELECT job.digits FROM job WHERE job.id = ?',
                 (job,)
             ).fetchone()
-            
+
             if digit not in valid:
                 print('unexpected :', digit)
                 abort(400)
-            
+
             if job_current is None:
                 if digit == '3':
                     job_id = ''.join(random.choices(string.ascii_letters, k=20))
@@ -189,10 +171,6 @@ def create_app(test_config=None):
                         (job_id, 1)
                     )
                     db.commit()
-                    room.send_text('@'+json.dumps({
-                        "msg": "Created job",
-                        "service": "a_pi",
-                        "id": job_id}))
                     return job_id
                 else:
                     abort(400)
@@ -207,10 +185,9 @@ def create_app(test_config=None):
                 else:
                     abort(418)
 
-            return 'Hello, World! : {} for {}'.format(digit, job)
         else:
             abort(400)
-    
+
     init_app(app)
 
     return app
