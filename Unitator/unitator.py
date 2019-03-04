@@ -32,6 +32,7 @@ def recv_data(conn):
         if not new_data:
             break
         data += new_data.decode()
+    print(data)
     return data
 
 def send(data):
@@ -47,7 +48,7 @@ def write(host, file_dir, job_id, text):
     sleep(3)
     pyautogui.typewrite('ssh ' + host + '\n')
     sleep(3)
-    pyautogui.hotkey('ctrl', 'd')
+    #pyautogui.hotkey('ctrl', 'd')
     pyautogui.typewrite("cd " + file_dir + '\n', interval=0.1)
     pyautogui.typewrite('vim ' + job_id + '\n', interval=0.1)
     sleep(1)
@@ -78,28 +79,34 @@ def listen():
     while True:
         conn, _ = notifier.accept()
         data = conn.recv(19)
-        conn.close()
         if data == b'pssssst want some ?':
+            data = b""
+            while True:
+                new_data = conn.recv(1)
+                if not new_data or new_data == b'#':
+                    break
+                data += new_data
+            conn.close()
+            
+            data = data.decode()
+            data = data.split('|')
+            print(data)
+            
+            if len(data) == 2:
+                host = data[0]
+                job_selector = data[1]
 
-            conn = send(b'\n')
-            entries = recv_data(conn)
+                job_conn = send(job_selector.encode()+b'\n')
+                segments = json.loads(recv_data(job_conn))
 
-            for entry in entries.split('\n'):
-                if len(entry.split('\t')) < 2:
-                    continue
-                selector = entry.split('\t')[1]
-                if selector[0] == '0':
-                    job_conn = send(selector.encode()+b'\n')
-                    segments = json.loads(recv_data(job_conn))
+                send(b'!/delete '+job_selector.encode()+b'\n')
 
-                    send(b'!/delete '+selector.encode()+b'\n')
-
-                    job_id = selector.split("/")[1]
-                    room.send_text('@' + json.dumps({
-                        "msg": "Fetched segments",
-                        "service": "unitator",
-                        "id": job_id
-                    }))
-                    unit(segments, job_id)
+                job_id = job_selector.split("/")[1]
+                room.send_text('@' + json.dumps({
+                    "msg": "Fetched segments",
+                    "service": "unitator",
+                    "id": job_id
+                }))
+                unit(segments, job_id)
 
 listen()

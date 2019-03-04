@@ -26,7 +26,7 @@ def make_pi(total):
         else:
             q, r, t, k, m, x = q*k, (2*q+r)*x, t*x, k+1, (q*(7*k+2)+r*x)//(t*x), x+2
 
-A_PI_ADDR = 'http://127.0.0.1:5000'
+A_PI_ADDR = 'http://127.0.0.1:4242'
 MAX_SEGMENT = 20
 MIN_SEGMENT = 5
 
