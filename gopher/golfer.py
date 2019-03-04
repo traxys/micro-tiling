@@ -8,6 +8,7 @@ HOST = 'Golfer'
 TCP_PORT = 3333
 FILE_DIR = 'files'
 
+
 def get_entries():
     """returns [(DirEntry)]
     """
@@ -25,9 +26,11 @@ def get_entries():
                   if isfile(join(FILE_DIR, f))):
         yield entry
 
+
 def get_selectors():
     return ((f, "0/" + f)
             for f in listdir(FILE_DIR) if isfile(join(FILE_DIR, f)))
+
 
 def main():
     listener = socket.socket()
