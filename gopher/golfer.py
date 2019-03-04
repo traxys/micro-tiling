@@ -50,28 +50,34 @@ def main():
             for entry in get_entries():
                 conn.send(entry.encode())
         else:
-            if data == "!/newfile":
-                for addr in notifications:
-                    try:
-                        notifier = socket.create_connection(addr)
-                        notifier.send(b"pssssst want some ?")
-                        notifier.close()
-                    except ConnectionRefusedError:
-                        print("Can't connect to notifier")
-                    except socket.gaierror:
-                        print("Invalid notifier address")
-                print("Notified")
+            data = data.split()
+            if data[0] == "!/newfile":
+                if len(data) == 2:
+                    for addr in notifications:
+                        try:
+                            notifier = socket.create_connection(addr)
+                            notifier.send(b"pssssst want some ?" + 
+                                          TCP_IP.encode() + 
+                                          b"|0/" + 
+                                          file_name.encode() + 
+                                          b"#") 
+                            notifier.close()
+                        except ConnectionRefusedError:
+                            print("Can't connect to notifier")
+                        except socket.gaierror:
+                            print("Invalid notifier address")
+                    print("Notified")
 
-            elif data.split()[0] == "!/notify":
+            elif data[0] == "!/notify":
                 print("Added hook: ", data)
-                if len(data.split()) == 2 and \
-                   len(data.split()[1].split(':')) == 2:
-                    addr, port = data.split()[1].split(':')
+                if len(data) == 2 and \
+                   len(data[1].split(':')) == 2:
+                    addr, port = data[1].split(':')
                     notifications.append((addr, port))
 
-            elif data.split()[0] == "!/delete":
-                if len(data.split()) == 2:
-                    selector_requested = data.split()[1]
+            elif data[0] == "!/delete":
+                if len(data) == 2:
+                    selector_requested = data[1]
                     for file_name in map(lambda x: x[0],
                                          filter(lambda x: x[1] == selector_requested,
                                                 get_selectors())):
@@ -79,7 +85,7 @@ def main():
 
 
             for file_name, selector in get_selectors():
-                if selector == data:
+                if selector == data[0]:
                     selected_file = open(FILE_DIR+'/'+file_name, "r")
                     conn.send(selected_file.read().encode())
                     selected_file.close()
