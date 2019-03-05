@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""Flask a_pi executing an action on each digit of pi sent
+"""
 
 import sqlite3
 import random
 import string
 import os
-import math
 import click
 from flask import Flask
 from flask import current_app, g, request
@@ -17,10 +18,17 @@ import grpc
 import mill_pb2
 import mill_pb2_grpc
 
+import segment_generator
+
 MAX_PI = 1000
-MILLLLLLLL_ADDR = os.environ['MILLLLLLLL_HOST'] + ':' + os.environ['MILLLLLLLL_PORT']
+MILLLLLLLL_ADDR = os.environ['MILLLLLLLL_HOST'] + \
+                  ':' + \
+                  os.environ['MILLLLLLLL_PORT']
+
 
 def get_db():
+    """Get the db associated with the application
+    """
     if 'db' not in g:
         g.db = sqlite3.connect(
             current_app.config['DATABASE'],
@@ -30,30 +38,45 @@ def get_db():
 
     return g.db
 
+
 def close_db(e=None):
+    """Closes the DB
+    """
     db = g.pop('db', None)
 
     if db is not None:
         db.close()
 
+
 def init_db():
+    """Generates a DB from a `schema.sql` file
+    """
     db = get_db()
 
     with current_app.open_resource('schema.sql') as f:
         db.executescript(f.read().decode('utf8'))
 
+
 @click.command('init-db')
 @with_appcontext
 def init_db_command():
-    """Clear the existing data and create new tables."""
+    """Clear the existing data and create new tables.
+
+    Usable from the command line"""
     init_db()
     click.echo('Initialized the database.')
 
+
 def init_app(app):
+    """Adds the database functions to the application
+    """
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
 
+
 def make_pi(total):
+    """Generates up to **total** digits of py
+    """
     q, r, t, k, m, x = 1, 0, 1, 1, 3, 3
     count = 0
     while True:
@@ -62,11 +85,16 @@ def make_pi(total):
             count += 1
             if count > total:
                 break
-            q, r, t, k, m, x = 10*q, 10*(r-m*t), t, k, (10*(3*q+r))//t - 10*m, x
+            q, r, t, k, m, x = 10*q, 10*(r-m*t), t, k, \
+                (10*(3*q+r))//t - 10*m, x
         else:
-            q, r, t, k, m, x = q*k, (2*q+r)*x, t*x, k+1, (q*(7*k+2)+r*x)//(t*x), x+2
+            q, r, t, k, m, x = q*k, (2*q+r)*x, t*x, k+1, \
+                (q*(7*k+2)+r*x)//(t*x), x+2
+
 
 def action(db, job_id, job_current):
+    """Advances the state of the job and executes the action
+    """
     db.execute(
         'UPDATE job SET digits = ?'
         ' WHERE id = ?',
@@ -75,12 +103,14 @@ def action(db, job_id, job_current):
     db.execute(
         'INSERT INTO segment (job_id, x1, y1, x2, y2)'
         ' VALUES (?, ?, ?, ?, ?)',
-        (job_id, random.random(), random.random(), random.random(), random.random())
+        (job_id,) + segment_generator.random_segment(1, 1)
     )
     db.commit()
 
+
 def terminate(db, job_id, mill_stub):
-    # TODO add RPC call
+    """Finishes the job and forwards it to the next service
+    """
     segments = db.execute(
         'SELECT x1, y1, x2, y2 FROM segment'
         ' WHERE job_id = ?',
@@ -102,7 +132,8 @@ def terminate(db, job_id, mill_stub):
             amount=8,
             segments=segments,
             result=segments
-    ))
+        )
+    )
 
     db.execute(
         'DELETE FROM job'
@@ -118,6 +149,7 @@ def terminate(db, job_id, mill_stub):
 
 
 def create_app(test_config=None):
+    """Generates the Flask application"""
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
