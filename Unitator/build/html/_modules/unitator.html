@@ -1,0 +1,301 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>unitator &mdash; Unitator 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Unitator
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../unitator.html">Unitator Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../clipping.html">Clipping Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Unitator</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>unitator</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for unitator</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/python</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">pyautogui</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
+
+<span class="n">GOPHER_IP</span> <span class="o">=</span> <span class="s1">&#39;127.0.0.1&#39;</span>
+<span class="n">GOPHER_PORT</span> <span class="o">=</span> <span class="mi">3333</span>
+
+<span class="n">SSH_HOST</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span>
+<span class="n">SSH_DIR</span> <span class="o">=</span> <span class="s2">&quot;unitator_files&quot;</span>
+
+<span class="n">TCP_PORT</span> <span class="o">=</span> <span class="mi">1337</span>
+<span class="n">TCP_IP</span> <span class="o">=</span> <span class="s1">&#39;127.0.0.1&#39;</span>
+
+<span class="n">TERMINAL</span> <span class="o">=</span> <span class="s2">&quot;/usr/bin/kitty&quot;</span>
+
+
+<div class="viewcode-block" id="recv_data"><a class="viewcode-back" href="../unitator.html#unitator.recv_data">[docs]</a><span class="k">def</span> <span class="nf">recv_data</span><span class="p">(</span><span class="n">conn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Recv all data from a socket *conn*</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">new_data</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">new_data</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">data</span> <span class="o">+=</span> <span class="n">new_data</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="send"><a class="viewcode-back" href="../unitator.html#unitator.send">[docs]</a><span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Send *data* using a gopher connnection on *host*:*port*</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">gopher_conn</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">create_connection</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
+    <span class="n">gopher_conn</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gopher_conn</span></div>
+
+
+<div class="viewcode-block" id="unit"><a class="viewcode-back" href="../unitator.html#unitator.unit">[docs]</a><span class="k">def</span> <span class="nf">unit</span><span class="p">(</span><span class="n">segments</span><span class="p">,</span> <span class="n">job_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Clip *segments* of the job *job_id* into a unit square and forwards them</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">write</span><span class="p">(</span><span class="n">TERMINAL</span><span class="p">,</span> <span class="n">SSH_HOST</span><span class="p">,</span> <span class="n">SSH_DIR</span><span class="p">,</span> <span class="n">job_id</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">segments</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="write"><a class="viewcode-back" href="../unitator.html#unitator.write">[docs]</a><span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">terminal</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">file_dir</span><span class="p">,</span> <span class="n">job_id</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Writes a *text* by ssh to the *host*,</span>
+<span class="sd">    in the directory *file_dir* in a file named *job_id*</span>
+<span class="sd">    using the *terminal* provided</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">terminal</span><span class="p">)</span>
+    <span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">pyautogui</span><span class="o">.</span><span class="n">typewrite</span><span class="p">(</span><span class="s1">&#39;ssh &#39;</span> <span class="o">+</span> <span class="n">host</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">pyautogui</span><span class="o">.</span><span class="n">hotkey</span><span class="p">(</span><span class="s1">&#39;ctrl&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">)</span>
+    <span class="n">pyautogui</span><span class="o">.</span><span class="n">typewrite</span><span class="p">(</span><span class="s2">&quot;cd &quot;</span> <span class="o">+</span> <span class="n">file_dir</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">pyautogui</span><span class="o">.</span><span class="n">typewrite</span><span class="p">(</span><span class="s1">&#39;vim &#39;</span> <span class="o">+</span> <span class="n">job_id</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">pyautogui</span><span class="o">.</span><span class="n">typewrite</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
+    <span class="n">pyautogui</span><span class="o">.</span><span class="n">press</span><span class="p">(</span><span class="s1">&#39;capslock&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+        <span class="n">pyautogui</span><span class="o">.</span><span class="n">typewrite</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="n">pyautogui</span><span class="o">.</span><span class="n">press</span><span class="p">(</span><span class="s1">&#39;enter&#39;</span><span class="p">)</span>
+    <span class="n">pyautogui</span><span class="o">.</span><span class="n">press</span><span class="p">(</span><span class="s1">&#39;capslock&#39;</span><span class="p">)</span>
+    <span class="n">pyautogui</span><span class="o">.</span><span class="n">press</span><span class="p">(</span><span class="s1">&#39;esc&#39;</span><span class="p">)</span>
+    <span class="n">pyautogui</span><span class="o">.</span><span class="n">typewrite</span><span class="p">(</span><span class="s1">&#39;:x&#39;</span><span class="p">)</span>
+    <span class="n">pyautogui</span><span class="o">.</span><span class="n">press</span><span class="p">(</span><span class="s1">&#39;enter&#39;</span><span class="p">)</span>
+    <span class="n">pyautogui</span><span class="o">.</span><span class="n">typewrite</span><span class="p">(</span><span class="s2">&quot;exit</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">pyautogui</span><span class="o">.</span><span class="n">typewrite</span><span class="p">(</span><span class="s2">&quot;exit</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="listen"><a class="viewcode-back" href="../unitator.html#unitator.listen">[docs]</a><span class="k">def</span> <span class="nf">listen</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Start a Unitator server listening for notifications of</span>
+<span class="sd">    a golfer server</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">notifier</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">()</span>
+    <span class="n">notifier</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="n">TCP_IP</span><span class="p">,</span> <span class="n">TCP_PORT</span><span class="p">))</span>
+
+    <span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;!/notify &#39;</span>
+         <span class="o">+</span> <span class="p">(</span><span class="n">TCP_IP</span><span class="o">+</span><span class="s1">&#39;:&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">TCP_PORT</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+         <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">GOPHER_IP</span><span class="p">,</span> <span class="n">GOPHER_PORT</span><span class="p">)</span>
+
+    <span class="n">notifier</span><span class="o">.</span><span class="n">listen</span><span class="p">()</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">conn</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">notifier</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">19</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;pssssst want some ?&#39;</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">new_data</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">new_data</span> <span class="ow">or</span> <span class="n">new_data</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;#&#39;</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">data</span> <span class="o">+=</span> <span class="n">new_data</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">host</span><span class="p">,</span> <span class="n">ip</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+                <span class="n">job_selector</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="n">job_conn</span> <span class="o">=</span> <span class="n">send</span><span class="p">(</span><span class="n">job_selector</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span><span class="o">+</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">ip</span><span class="p">)</span>
+                <span class="n">raw</span> <span class="o">=</span> <span class="n">recv_data</span><span class="p">(</span><span class="n">job_conn</span><span class="p">)</span>
+                <span class="n">segments</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+
+                <span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;!/delete &#39;</span><span class="o">+</span><span class="n">job_selector</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span><span class="o">+</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">ip</span><span class="p">)</span>
+
+                <span class="n">job_id</span> <span class="o">=</span> <span class="n">job_selector</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">unit</span><span class="p">(</span><span class="n">segments</span><span class="p">,</span> <span class="n">job_id</span><span class="p">)</span></div>
+
+<span class="c1">#listen()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Aurélien Moisson-franckhauser, Johyn Papin, Quentin Boyer
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
