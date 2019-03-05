@@ -1,1 +1,5 @@
 build
+pubring.kbx
+pubring.kbx~
+random_seed
+trustdb.gpg
