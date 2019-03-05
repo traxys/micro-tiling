@@ -63,11 +63,13 @@ def main():
                     for addr in notifications:
                         try:
                             notifier = socket.create_connection(addr)
-                            notifier.send(b"pssssst want some ?" + 
-                                          TCP_IP.encode() + 
-                                          b"|0/" + 
-                                          data[1].encode() + 
-                                          b"#") 
+                            notifier.send(b"pssssst want some ?" +
+                                          TCP_IP.encode() +
+                                          b":" +
+                                          str(TCP_PORT).encode() +
+                                          b"|0/" +
+                                          data[1].encode() +
+                                          b"#")
                             notifier.close()
                         except ConnectionRefusedError:
                             print("Can't connect to notifier")
