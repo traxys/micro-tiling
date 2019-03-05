@@ -2,29 +2,20 @@
 import pyinotify
 import json
 import os
-from matrix_client.client import MatrixClient
 
-def get_room():
-    client = MatrixClient("http://localhost:8008")
+WATCH_DIR = '/home/traxys/unitator_files'
 
-    matrix_param_file = open("../matrix_user.json","r")
-    matrix_param = json.loads(matrix_param_file.read())
-    matrix_param_file.close()
-
-    token = client.login(username=matrix_param["username"], password=matrix_param["password"])
-    return client.join_room(matrix_param["room"]);
-
-ROOM = get_room()
 
 def translation(segments, job_id):
-    ROOM.send_text('@' + json.dumps({
-        "msg": "Read segments",
-        "service": "translator",
-        "id": job_id
-    }))
-    print(job_id, segments)
+    """Creates replicas of the segments in the eight directions
+    """
+    pass
 
-def listen():
+
+def listen(watch_dir):
+    """Listen for new files in *watch_dir* and reads them, translates the
+    segments and forwards them
+    """
     wm = pyinotify.WatchManager()
     mask = pyinotify.IN_CREATE
 
@@ -39,7 +30,7 @@ def listen():
     handler = EventHandler()
     notifier = pyinotify.Notifier(wm, handler)
 
-    wm.add_watch('/home/traxys/unitator_files', mask)
+    wm.add_watch(watch_dir, mask)
     notifier.loop()
 
-listen()
+#listen(watch_dir)
