@@ -11,6 +11,8 @@ from flask.cli import with_appcontext
 from werkzeug.exceptions import abort
 from flask import jsonify
 
+import threading
+
 MAX_STATE = 42
 A_PI_ADDRESS = os.environ['A_PI_ADDRESS'] or 'http://localhost:5000'
 
@@ -129,7 +131,9 @@ def create_app(test_config=None):
             (job_id, 0)
         )
         db.commit()
-        init.generate_segments(job_id, A_PI_ADDRESS)
+        t = threading.Thread(target=init.generate_segments,
+                             args=(job_id, A_PI_ADDRESS))
+        t.start()
         return jsonify({"id": job_id})
 
     return app
