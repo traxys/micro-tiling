@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\nmill.proto\"\x1d\n\x05Point\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\"/\n\x07Segment\x12\x11\n\x01\x61\x18\x01 \x01(\x0b\x32\x06.Point\x12\x11\n\x01\x62\x18\x02 \x01(\x0b\x32\x06.Point\"_\n\x03Job\x12\x12\n\x02id\x18\x01 \x01(\x0b\x32\x06.JobId\x12\x0e\n\x06\x61mount\x18\x02 \x01(\r\x12\x1a\n\x08segments\x18\x03 \x03(\x0b\x32\x08.Segment\x12\x18\n\x06result\x18\x04 \x03(\x0b\x32\x08.Segment\"\x13\n\x05JobId\x12\n\n\x02id\x18\x01 \x01(\t\"\n\n\x08Response2!\n\x04Mill\x12\x19\n\x04Turn\x12\x04.Job\x1a\t.Response\"\x00\x62\x06proto3')
+  serialized_pb=_b('\n\nmill.proto\"\x1d\n\x05Point\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\"/\n\x07Segment\x12\x11\n\x01\x61\x18\x01 \x01(\x0b\x32\x06.Point\x12\x11\n\x01\x62\x18\x02 \x01(\x0b\x32\x06.Point\"-\n\x03Job\x12\n\n\x02id\x18\x01 \x01(\t\x12\x1a\n\x08segments\x18\x02 \x03(\x0b\x32\x08.Segment\"\n\n\x08Response2!\n\x04Mill\x12\x19\n\x04Turn\x12\x04.Job\x1a\t.Response\"\x00\x62\x06proto3')
 )
 
 
@@ -110,28 +110,14 @@ _JOB = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='id', full_name='Job.id', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='amount', full_name='Job.amount', index=1,
-      number=2, type=13, cpp_type=3, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='segments', full_name='Job.segments', index=2,
-      number=3, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='result', full_name='Job.result', index=3,
-      number=4, type=11, cpp_type=10, label=3,
+      name='segments', full_name='Job.segments', index=1,
+      number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -149,38 +135,7 @@ _JOB = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=94,
-  serialized_end=189,
-)
-
-
-_JOBID = _descriptor.Descriptor(
-  name='JobId',
-  full_name='JobId',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='id', full_name='JobId.id', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=191,
-  serialized_end=210,
+  serialized_end=139,
 )
 
 
@@ -203,19 +158,16 @@ _RESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=212,
-  serialized_end=222,
+  serialized_start=141,
+  serialized_end=151,
 )
 
 _SEGMENT.fields_by_name['a'].message_type = _POINT
 _SEGMENT.fields_by_name['b'].message_type = _POINT
-_JOB.fields_by_name['id'].message_type = _JOBID
 _JOB.fields_by_name['segments'].message_type = _SEGMENT
-_JOB.fields_by_name['result'].message_type = _SEGMENT
 DESCRIPTOR.message_types_by_name['Point'] = _POINT
 DESCRIPTOR.message_types_by_name['Segment'] = _SEGMENT
 DESCRIPTOR.message_types_by_name['Job'] = _JOB
-DESCRIPTOR.message_types_by_name['JobId'] = _JOBID
 DESCRIPTOR.message_types_by_name['Response'] = _RESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -240,13 +192,6 @@ Job = _reflection.GeneratedProtocolMessageType('Job', (_message.Message,), dict(
   ))
 _sym_db.RegisterMessage(Job)
 
-JobId = _reflection.GeneratedProtocolMessageType('JobId', (_message.Message,), dict(
-  DESCRIPTOR = _JOBID,
-  __module__ = 'mill_pb2'
-  # @@protoc_insertion_point(class_scope:JobId)
-  ))
-_sym_db.RegisterMessage(JobId)
-
 Response = _reflection.GeneratedProtocolMessageType('Response', (_message.Message,), dict(
   DESCRIPTOR = _RESPONSE,
   __module__ = 'mill_pb2'
@@ -262,8 +207,8 @@ _MILL = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=224,
-  serialized_end=257,
+  serialized_start=153,
+  serialized_end=186,
   methods=[
   _descriptor.MethodDescriptor(
     name='Turn',
