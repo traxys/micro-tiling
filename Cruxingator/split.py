@@ -5,24 +5,36 @@ from math import sqrt
 from numpy import array
 from numpy.linalg import inv
 
+
 class Vect:
+    """Two dimensional Vector"""
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
     def norm2(self):
+        """Squared norm of the vector
+        """
         return self.x * self.x + self.y * self.y
+
     def __abs__(self):
         return sqrt(self.x * self.x + self.y * self.y)
+
     def __add__(self, other):
         return Vect(self.x + other.x, self.y + other.y)
+
     def __sub__(self, other):
         return Vect(self.x - other.x, self.y - other.y)
+
     def __mul__(self, other):
         return Vect(self.x * other, self.y * other)
+
     def __rmul__(self, other):
         return self * other
+
     def __div__(self, other):
         return Vect(self.x / other, self.y / other)
+
     def __rdiv__(self, other):
         return self / other
 
@@ -31,60 +43,82 @@ class Vect:
 
 
 class Segment:
+    """Segment between two endpoints
+    """
     def __init__(self, a, b):
         self.a = a
         self.b = b
+
     def __abs__(self):
         return abs(self.b - self.a)
+
     def intersect(self, other):
+        """Calculate the intersection point beetween *self* and *other*
+        """
         self_v = self.b-self.a
         other_v = other.b-other.a
         base = array([[self_v.x, other_v.x], [self_v.y, other_v.y]])
         try:
             inv_base = inv(base)
         except:
-            return -1,-1
+            return -1, -1
         aa = other.a - self.a
-        k1 = aa.x*inv_base[0,0] + aa.y*inv_base[0,1]
-        k2 = -aa.x*inv_base[1,0] - aa.y*inv_base[1,1]
+        k1 = aa.x*inv_base[0, 0] + aa.y*inv_base[0, 1]
+        k2 = -aa.x*inv_base[1, 0] - aa.y*inv_base[1, 1]
         return k1, k2
 
 
 def pairs(l):
+    """Iterate on pairs of segments
+    """
     for i, e1 in enumerate(l):
         for e2 in l[i+1:]:
             yield e1, e2
 
+
 def find_intersections(segments):
+    """Find all intersections between *segments*
+    """
     for s in segments:
         s.intersections = []
     for s1, s2 in pairs(segments):
         k1, k2 = s1.intersect(s2)
         print(k1, k2)
-        if 0<=k1<=1 and 0<=k2<=1:
+        if 0 <= k1 <= 1 and 0 <= k2 <= 1:
             s1.intersections.append((k1, s2))
             s2.intersections.append((k2, s1))
     for s in segments:
-        s.intersections = sorted(s.intersections, key = lambda t: t[0])
+        s.intersections = sorted(s.intersections, key=lambda t: t[0])
 
 
 class Point:
+    """ Points in two dimensions
+    """
     def __init__(self, pos):
         '''
         pos is a Vect
         '''
         self.pos = pos
         self.linked = []
+
     def merge(self, other):
+        """ Tells two points are equivalent
+        """
         self.linked += other.linked
-    def get_pos(self, precision = 1e-10):
-        return (int(self.pos.x/precision)*precision,  int(self.pos.y/precision)*precision)
+
+    def get_pos(self, precision=1e-10):
+        """Get a rounded position at *precision* level
+        """
+        return (int(self.pos.x/precision)*precision,
+                int(self.pos.y/precision)*precision)
 
     def __repr__(self):
         return 'Point('+str(self.pos.x)+', '+str(self.pos.y)+')'
 
 
 def cut(segments):
+    """Cuts the *segments* such that no two segments cross
+    """
     find_intersections(segments)
     points = []
     for s in segments:

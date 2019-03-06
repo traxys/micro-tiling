@@ -10,7 +10,7 @@ FILE_DIR = 'files'
 
 
 def get_entries():
-    """returns [(DirEntry)]
+    """returns `[(DirEntry)]` as defined by the gopher protocol
     """
     commands = ['newfile', 'notify', 'delete']
     for com in commands:
@@ -28,11 +28,15 @@ def get_entries():
 
 
 def get_selectors():
+    """returns a list of selectors for the known files
+    """
     return ((f, "0/" + f)
             for f in listdir(FILE_DIR) if isfile(join(FILE_DIR, f)))
 
 
 def main():
+    """Starts the gopher server
+    """
     listener = socket.socket()
     listener.bind((TCP_IP, TCP_PORT))
     listener.listen()
@@ -59,11 +63,13 @@ def main():
                     for addr in notifications:
                         try:
                             notifier = socket.create_connection(addr)
-                            notifier.send(b"pssssst want some ?" + 
-                                          TCP_IP.encode() + 
-                                          b"|0/" + 
-                                          data[1].encode() + 
-                                          b"#") 
+                            notifier.send(b"pssssst want some ?" +
+                                          TCP_IP.encode() +
+                                          b":" +
+                                          str(TCP_PORT).encode() +
+                                          b"|0/" +
+                                          data[1].encode() +
+                                          b"#")
                             notifier.close()
                         except ConnectionRefusedError:
                             print("Can't connect to notifier")

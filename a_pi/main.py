@@ -4,8 +4,6 @@
 """
 
 import sqlite3
-import random
-import string
 import os
 import click
 from flask import Flask
@@ -62,20 +60,20 @@ def init_db():
 def init_db_command():
     """Clear the existing data and create new tables.
 
-    Usable from the command line"""
+    Usable from the command line: `flask init-db`"""
     init_db()
     click.echo('Initialized the database.')
 
 
 def init_app(app):
-    """Adds the database functions to the application
+    """Adds the database functions to the application *app*
     """
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
 
 
 def make_pi(total):
-    """Generates up to **total** digits of py
+    """Generates up to *total* digits of pi
     """
     q, r, t, k, m, x = 1, 0, 1, 1, 3, 3
     count = 0
@@ -93,7 +91,11 @@ def make_pi(total):
 
 
 def action(db, job_id, job_current):
-    """Advances the state of the job and executes the action
+    """Advances the state of the job *job_id* using the state *job_current* as
+    inital state and executes an action, here `segment generation`_
+
+    .. _segment generation: segment_generator.html#\
+                            segment_generator.random_segment
     """
     db.execute(
         'UPDATE job SET digits = ?'
@@ -109,7 +111,7 @@ def action(db, job_id, job_current):
 
 
 def terminate(db, job_id, mill_stub):
-    """Finishes the job and forwards it to the next service
+    """Finishes the job *job_id* and forwards it to the *mill_stub*
     """
     segments = db.execute(
         'SELECT x1, y1, x2, y2 FROM segment'
@@ -175,12 +177,13 @@ def create_app(test_config=None):
 
     pi = [str(d) for d in make_pi(MAX_PI)]
 
-    @app.route('/', methods=('GET', 'POST'))
+    @app.route('/', methods=('POST',))
     def hello():
         valid = [str(i) for i in range(0, 10)]
         valid.append('π')
 
         if request.method == 'POST':
+            print("aaaaaaaaaaaa")
             digit = request.form['digit']
             job = request.form['job']
 
@@ -196,14 +199,14 @@ def create_app(test_config=None):
 
             if job_current is None:
                 if digit == '3':
-                    job_id = ''.join(random.choices(string.ascii_letters, k=20))
                     db.execute(
                         'INSERT INTO job (id, digits)'
                         ' VALUES (?, ?)',
-                        (job_id, 1)
+                        (job, 1)
                     )
                     db.commit()
-                    return job_id
+                    action(db, job, 0)
+                    return 'π'
                 else:
                     abort(400)
             else:

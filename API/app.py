@@ -3,6 +3,7 @@ import sqlite3
 import string
 import random
 from flask import Flask
+import init
 
 import click
 from flask import current_app, g
@@ -11,9 +12,12 @@ from werkzeug.exceptions import abort
 from flask import jsonify
 
 MAX_STATE = 42
+A_PI_ADDRESS = "http://localhost:5000"
+
 
 def get_public_state(state):
     return "started"
+
 
 def init_db():
     db = get_db()
@@ -21,12 +25,14 @@ def init_db():
     with current_app.open_resource('schema.sql') as f:
         db.executescript(f.read().decode('utf8'))
 
+
 @click.command('init-db')
 @with_appcontext
 def init_db_command():
     """Clear the existing data and create new tables."""
     init_db()
     click.echo('Initialized the database.')
+
 
 def get_db():
     if 'db' not in g:
@@ -38,15 +44,18 @@ def get_db():
 
     return g.db
 
+
 def close_db(e=None):
     db = g.pop('db', None)
 
     if db is not None:
         db.close()
 
+
 def init_app(app):
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
+
 
 def create_app(test_config=None):
     # create and configure the app
@@ -81,8 +90,9 @@ def create_app(test_config=None):
         if state is None:
             abort(404)
         state = state['state']
-        return jsonify({"state": get_public_state(state), "completion": round(state/MAX_STATE)})
-    
+        return jsonify({"state": get_public_state(state),
+                        "completion": round(state/MAX_STATE)})
+
     @app.route('/<string:job_id>/address', methods=('GET',))
     def get_address(job_id):
         db = get_db()
@@ -95,7 +105,7 @@ def create_app(test_config=None):
             abort(404)
         address = address['address']
         return jsonify({"address": address})
-    
+
     @app.route('/<string:job_id>/result', methods=('GET',))
     def get_result(job_id):
         db = get_db()
@@ -109,7 +119,6 @@ def create_app(test_config=None):
         result = result['segments']
         return jsonify({"result": result})
 
-
     @app.route('/', methods=('POST',))
     def new_job():
         db = get_db()
@@ -120,6 +129,7 @@ def create_app(test_config=None):
             (job_id, 0)
         )
         db.commit()
+        init.generate_segments(job_id, A_PI_ADDRESS)
         return jsonify({"id": job_id})
 
     return app

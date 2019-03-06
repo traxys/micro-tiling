@@ -1,5 +1,5 @@
-Reference for the segment generation
-====================================
+Segment generation
+===================
 
 .. automodule:: segment_generator
    :members:
