@@ -12,7 +12,7 @@ import rotate
 import json
 
 
-GOPHER_PATH = '../gopher/files/'
+GOPHER_PATH = 'gopher/files/'
 GOPHER_IP = '127.0.0.1'
 GOPHER_PORT = 3333
 
