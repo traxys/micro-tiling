@@ -180,7 +180,6 @@ def create_app(test_config=None):
         valid.append('π')
 
         if request.method == 'POST':
-            print("aaaaaaaaaaaa")
             digit = request.form['digit']
             job = request.form['job']
 
