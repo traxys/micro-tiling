@@ -8,6 +8,9 @@ import mill_pb2
 import mill_pb2_grpc
 import socket
 from google.protobuf.json_format import MessageToDict
+import rotate
+import json
+
 
 GOPHER_PATH = '../gopher/files/'
 GOPHER_IP = '127.0.0.1'
@@ -27,13 +30,23 @@ def write(job, job_id):
     GOPHER_SOCKET.close()
 
 
+def segment_to_tuple(segment):
+    """Transforms a *segment* from a dict to a tuple
+    """
+    return ((segment['a']['x'], segment['a']['y']),
+            (segment['b']['x'], segment['b']['y']))
+
+
 class MillServicer(mill_pb2_grpc.MillServicer):
     """Serves a Millllllll gRPC server
     """
     def Turn(self, request, context):
         """Turns segments contained in the RPC message *request*
         """
-        # write(request)
+        segments = MessageToDict(request)["segments"]
+        segments = list(map(segment_to_tuple, segments))
+        rotated_segments = rotate.mirror_and_turn_segments(segments, True)
+        write(json.dumps(rotated_segments))
         return mill_pb2.Response()
 
 

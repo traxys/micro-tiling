@@ -125,15 +125,12 @@ def terminate(db, job_id, mill_stub):
                         y=s['y1']),
                     b=mill_pb2.Point(
                         x=s['x2'],
-                        y=s['x2'])) for s in segments]
+                        y=s['y2'])) for s in segments]
 
     mill_stub.Turn(
         mill_pb2.Job(
-            id=mill_pb2.JobId(
-                id=job_id),
-            amount=8,
+            id=job_id,
             segments=segments,
-            result=segments
         )
     )
 
