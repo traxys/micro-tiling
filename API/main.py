@@ -12,7 +12,7 @@ from werkzeug.exceptions import abort
 from flask import jsonify
 
 MAX_STATE = 42
-A_PI_ADDRESS = "http://localhost:5000"
+A_PI_ADDRESS = os.environ['A_PI_ADDRESS'] or 'http://localhost:5000'
 
 
 def get_public_state(state):
@@ -133,3 +133,5 @@ def create_app(test_config=None):
         return jsonify({"id": job_id})
 
     return app
+
+app = create_app()
