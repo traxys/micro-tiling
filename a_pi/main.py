@@ -4,8 +4,6 @@
 """
 
 import sqlite3
-import random
-import string
 import os
 import click
 from flask import Flask
@@ -179,12 +177,13 @@ def create_app(test_config=None):
 
     pi = [str(d) for d in make_pi(MAX_PI)]
 
-    @app.route('/', methods=('GET', 'POST'))
+    @app.route('/', methods=('POST',))
     def hello():
         valid = [str(i) for i in range(0, 10)]
         valid.append('π')
 
         if request.method == 'POST':
+            print("aaaaaaaaaaaa")
             digit = request.form['digit']
             job = request.form['job']
 
@@ -200,14 +199,14 @@ def create_app(test_config=None):
 
             if job_current is None:
                 if digit == '3':
-                    job_id = ''.join(random.choices(string.ascii_letters, k=20))
                     db.execute(
                         'INSERT INTO job (id, digits)'
                         ' VALUES (?, ?)',
-                        (job_id, 1)
+                        (job, 1)
                     )
                     db.commit()
-                    return job_id
+                    action(db, job, 0)
+                    return 'π'
                 else:
                     abort(400)
             else:
