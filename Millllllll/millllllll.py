@@ -21,12 +21,12 @@ def write(job, job_id):
     """Write a *job* to a gopher served directory
     while notifing a golfer server of the *job_id*
     """
-    f = open(GOPHER_PATH + job.id.id, 'w')
+    f = open(GOPHER_PATH + job_id, 'w')
     f.write(job)
     f.close()
     GOPHER_SOCKET = \
         socket.create_connection((GOPHER_IP, GOPHER_PORT))
-    GOPHER_SOCKET.send(b'!/newfile ' + job.id.id.encode() + b'\n')
+    GOPHER_SOCKET.send(b'!/newfile ' + job_id.encode() + b'\n')
     GOPHER_SOCKET.close()
 
 
@@ -46,7 +46,7 @@ class MillServicer(mill_pb2_grpc.MillServicer):
         segments = MessageToDict(request)["segments"]
         segments = list(map(segment_to_tuple, segments))
         rotated_segments = rotate.mirror_and_turn_segments(segments, True)
-        write(json.dumps(rotated_segments))
+        write(json.dumps(list(rotated_segments)), request.id)
         return mill_pb2.Response()
 
 
