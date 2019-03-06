@@ -3,7 +3,6 @@
 An API capable of generating mosaics, based on micro services.
 
 ![Alt text](./protocol.svg)
-<img src="./protocol.svg">
 
 ## Getting Started
 
