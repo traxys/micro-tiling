@@ -2,6 +2,9 @@
 
 An API capable of generating mosaics, based on micro services.
 
+![Alt text](./protocol.svg)
+<img src="./protocol.svg">
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
