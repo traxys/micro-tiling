@@ -70,11 +70,39 @@ while True:
         break
     sleep(0.04)#I don't want to overload my computer if there is a bug
 
-debug("let's end this all\n")
+if n_of_neighbours > 1:
+    debug("finally it has ended. Let me tell my friends I am alive\n")
 
+    for msg in write_neighbours:
+        msg.write('alive '+own_pid+'\n')
+        msg.flush()
+        msg.close()
+
+    res = open('result', 'a')
+    while True:
+        try:
+            m = messages.readline()
+        except BrokenPipeError:
+            break
+        if m != '':
+            state = m.split()[0]
+            pid = int(m.split()[1])
+            if state == 'alive' and pid > int(own_pid):
+                res.write(str(pid)+' '+own_pid+'\n')
+                res.flush()
+    res.close()
+else:
+    debug("I know I'm dead but let me say one last goodbye to my friends\n")
+    for msg in write_neighbours:
+        msg.write('dead '+own_pid+'\n')
+        msg.flush()
+        msg.close()
+
+'''
 res = open('result', 'a')
 if n_of_neighbours > 1:
     res.write('hey, I am the process : '+own_pid+' and I am alive !\n')
 else:
     res.write('hey, I am the process : '+own_pid+' and I am dead !\n')
 res.close()
+'''

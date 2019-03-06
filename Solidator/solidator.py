@@ -97,6 +97,7 @@ def remove_deg_1(points, multithread = True):
         for p in points:
             p.msg.write('e')#tell them it is the end
             p.msg.flush()
+            p.msg.close()
         return []
 
     else:
