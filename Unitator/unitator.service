@@ -1,8 +1,0 @@
-[Unit]
-Requires=golfer.service
-After=golfer.service
-Description=Unitator
-
-[Service]
-ExecStart=<PATH>/micro-tiling/Unitator/unitator.py
-WorkingDirectory=<PATH>/micro-tiling/gopher

@@ -1,6 +1,0 @@
-[Unit]
-Description=Translator
-
-[Service]
-ExecStart=<PATH>/micro-tiling/Translator/translator.py
-WorkingDirectory=<PATH>/micro-tiling/translator

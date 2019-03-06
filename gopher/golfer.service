@@ -1,7 +1,0 @@
-[Unit]
-Description=Golfer Server
-
-[Service]
-ExecStart=<PATH>/micro-tiling/gopher/golfer.py
-WorkingDirectory=<PATH>/micro-tiling/gopher
-StopWhenUnneeded=yes

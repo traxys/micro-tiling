@@ -1,9 +1,0 @@
-[Unit]
-Requires=millllllll.service
-After=millllllll.service
-Description=A PI
-
-[Service]
-ExecStart=FLASK_APP=main.py /usr/bin/flask run
-WorkingDirectory=<PATH>/micro-tiling/micro-tiling/a_pi
-StopWhenUnneeded=yes
