@@ -1,5 +1,10 @@
 #! /usr/bin/python3
 from math import sqrt
+import subprocess, signal
+from os.path import abspath
+from os import getpid, mkfifo
+from time import sleep
+import sys
 
 class Vect:
     def __init__(self, x, y):
@@ -47,20 +52,81 @@ class Point:
         return 'Point('+str(self.pos.x)+', '+str(self.pos.y)+')'
 
 
-def remove_deg_1(points):
+def open_process(point):
+    proc = subprocess.Popen([abspath('./point_process.py'), str(len(point.linked)), str(getpid())], stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = sys.stdout)
+    return proc
 
-    deg1 = [p for p in points if len(p.linked)==1]
+def remove_deg_1(points, multithread = True):
+    if multithread:
+        mkfifo('msg_main')
+        number_deg1 = 0
+        for p in points:
+            if len(p.linked) == 1:
+                number_deg1 += 1
+            p.proc = open_process(p)
+        messages = open('msg_main', 'r')
 
-    while deg1:
-        p = deg1.pop()
-        p.linked[0].linked.remove(p)
-        if len(p.linked[0].linked) == 1:
-            deg1.append(p.linked[0])
-        p.linked = []
+        for p in points:
+            try:
+                mkfifo('msg_'+str(p.proc.pid))
+            except FileExistsError:
+                pass
+            p.msg = open('msg_'+str(p.proc.pid), 'w')
 
-    return [p for p in points if len(p.linked)>1]
+        unprepared_processes = len(points)
+        while unprepared_processes:
+            print('waiting for '+str(unprepared_processes)+' processes')
+            messages.read(1)
+            unprepared_processes -= 1
+
+        for p in points:
+            for neighbour in p.linked:
+                p.proc.stdin.write(bytes(str(neighbour.proc.pid), 'utf-8')+b'\n')
+                p.proc.stdin.flush()
+                print('wrote one neighbour')
+        
+
+        while number_deg1:
+            print('deg1 left :',number_deg1)
+            messages.read(1)
+            number_deg1 -= 1
+            sleep(0.1)
+    
+        res = open('result', 'w')
+        res.close()
+        for p in points:
+            p.msg.write('e')#tell them it is the end
+            p.msg.flush()
+        return []
+
+    else:
+        deg1 = [p for p in points if len(p.linked)==1]
+
+        while deg1:
+            p = deg1.pop()
+            p.linked[0].linked.remove(p)
+            if len(p.linked[0].linked) == 1:
+                deg1.append(p.linked[0])
+            p.linked = []
+
+        return [p for p in points if len(p.linked)>1]
 
 
 if __name__ == "__main__":
-    print(remove_deg_1([Point(Vect(1,1))]))
+    def link(p1, p2):
+        p1.linked.append(p2)
+        p2.linked.append(p1)
+
+    p1 = Point(Vect(1,1))
+    p2 = Point(Vect(0,0))
+    p3 = Point(Vect(1,-1))
+    p4 = Point(Vect(1,0))
+    
+    link(p1,p2)
+    link(p2,p3)
+    link(p3,p4)
+    link(p2,p4)
+    
+    
+    print(remove_deg_1([p1, p2, p3, p4]))
 
