@@ -1,0 +1,194 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This API is used to generate mosaics.  The underlying architure is availaible on [github](https://github.com/traxys/micro-tiling). The time needed for a request is beetween 5 and 15 mins on average",
+    "version": "1.0.0",
+    "title": "Micro-Tiling API",
+    "license": {
+      "name": "GPL 3.0",
+      "url": "https://www.gnu.org/licenses/gpl-3.0.en.html"
+    }
+  },
+  "host": "petstore.swagger.io",
+  "basePath": "/",
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/": {
+      "post": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Creates a new job",
+        "description": "",
+        "operationId": "newJob",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Succesfuly created job",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/{jobId}/state": {
+      "get": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Gets the state of a job",
+        "description": "",
+        "operationId": "jobState",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the requested job",
+            "pattern": "^[A-z]{20}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "State of the job",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "completion": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "state": {
+                  "type": "string",
+                  "enum": [
+                    "started"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Unknown Job"
+          },
+          "405": {
+            "description": "Invalid Method"
+          }
+        }
+      }
+    },
+    "/{jobId}/address": {
+      "get": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Gets the address needing ensicoins for a job",
+        "description": "",
+        "operationId": "jobAddress",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the requested job",
+            "pattern": "^[A-z]{20}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ensicoin address",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "address": {
+                  "type": "string",
+                  "format": "ensicoin-address"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Unknown Job or No Address needed"
+          },
+          "405": {
+            "description": "Invalid Method"
+          }
+        }
+      }
+    },
+    "/{jobId}/result": {
+      "get": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Get the final mosaic in a job",
+        "description": "",
+        "operationId": "result",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the requested job",
+            "pattern": "^[A-z]{20}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SVG file",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "format": "svg"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Unknown Job or Job not done"
+          },
+          "405": {
+            "description": "Invalid Method"
+          }
+        }
+      }
+    }
+  }
+}
