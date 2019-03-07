@@ -4,10 +4,11 @@ metadata:
   name: api-service
 spec:
   selector:
-    app: api-pod
+    app: api
   ports:
-    - port: 80
-  type: LoadBalancer
+    - name: web
+      port: 80
+      targetPort: 80
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -30,6 +31,22 @@ spec:
           env:
             - name: A_PI_ADDRESS
               value: "api-service"
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: micro-tiling-api
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.frontend.priority: "1"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        backend:
+          serviceName: api-service
+          servicePort: web
 ---
 apiVersion: v1
 kind: Service
@@ -57,5 +74,5 @@ spec:
     spec:
       containers:
         - name: a-pi-pod
-          image: microtiling/a-pi
+          image: microtiling/a_pi
           imagePullPolicy: Always
