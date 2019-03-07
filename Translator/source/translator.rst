@@ -1,5 +1,5 @@
-Translator Service
-==================
+Translator Reference
+====================
 
 .. automodule:: translator
     :members:

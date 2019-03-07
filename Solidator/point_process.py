@@ -8,6 +8,9 @@ and they listen for neighbours sending SIGUSR1 to signal they have a degree of 1
 import signal
 from os import kill, mkfifo, getpid
 
+svg_scale = 100
+
+
 write_main = open('msg_main', 'w')
 own_pid = str(getpid())
 try:
@@ -36,6 +39,7 @@ write_main.write('r')#tell main we are ready
 write_main.flush()
 
 #find neighbours
+position = [int(s) for s in sys.stdin.readline().split()]
 debug('waiting for neighbours\n')
 while len(neighbours_pid) < n_of_neighbours:
     neighbours_pid.append(int(sys.stdin.readline()))
@@ -50,31 +54,66 @@ def share_death():
     for fifo in write_neighbours:
         fifo.write('d')
         fifo.flush()
-    print('dead')
     debug('I DIED !!!\n')
 
 
 #talk if needed
+n_of_live_neighbours = n_of_neighbours
 while True:
-    if n_of_neighbours == 1:
+    if n_of_live_neighbours == 1:
         share_death()
     m = messages.read(1)
-    debug('received message : '+m+'\n')
+    # debug('received message : '+m+'\n')
     if m == 'd':
-        debug("a neighbour died !\n")
-        n_of_neighbours -= 1
-        if n_of_neighbours == 0 or n_of_neighbours > 1:
+        debug("one of my neighbours died !\n")
+        n_of_live_neighbours -= 1
+        if n_of_live_neighbours == 0 or n_of_live_neighbours > 1:
             write_main.write('d')
             write_main.flush()
     elif m == 'e':
         break
-    sleep(0.04)#I don't want to overload my computer if there is a bug
+    sleep(0.04)# I don't want to overload my computer if there is a bug
 
-debug("let's end this all\n")
 
-res = open('result', 'a')
+
 if n_of_neighbours > 1:
-    res.write('hey, I am the process : '+own_pid+' and I am alive !\n')
+    debug("finally it has ended. Let me tell my friends I am alive\n")
+
+    for msg in write_neighbours:
+        msg.write(own_pid+' '+' '.join(str(c) for c in position)+'\n')
+        msg.flush()
+        msg.close()
+
+    res = open('result.svg', 'a')
+    dead_processes = 0
+    while dead_processes < n_of_neighbours:
+        m = messages.readline()
+        if m != '':
+            if m == 'd\n':
+                dead_processes += 1
+            else:
+                svg_coord = lambda x: x*svg_scale + 3*svg_scale
+                dead_processes += 1
+                pid = int(m.split()[0])
+                if pid > int(own_pid):
+                    res.write('<line x1="{}" y1="{}" x2="{}" y2="{}" style="stroke:rgb(255,0,0)"/>\n'.format(svg_coord(position[0]), svg_coord(position[1]), svg_coord(float(m.split()[1])), svg_coord(float(m.split()[2]))))
+                    res.flush()
+    res.close()
 else:
-    res.write('hey, I am the process : '+own_pid+' and I am dead !\n')
-res.close()
+    for msg in write_neighbours:
+        msg.write('d\n')
+        msg.flush()
+        msg.close()
+
+    # wait till every pipe writer closed their end before dying
+    dead_processes = 0
+    while dead_processes < n_of_neighbours:
+        m = messages.readline()
+        if m == 'd\n' or len(m.split()) == 3:
+            dead_processes += 1
+
+debug("And now I am dead.\n")
+write_main.write('e')
+write_main.flush()
+write_main.close()
+

@@ -4,6 +4,7 @@ import json
 import pyautogui
 import subprocess
 from time import sleep
+import clipping
 
 GOPHER_IP = '127.0.0.1'
 GOPHER_PORT = 3333
@@ -40,7 +41,22 @@ def send(data, host, port):
 def unit(segments, job_id):
     """Clip *segments* of the job *job_id* into a unit square and forwards them
     """
-    write(TERMINAL, SSH_HOST, SSH_DIR, job_id, json.dumps(segments, indent=4))
+    segments = [clipping.segment(
+                    clipping.p(segment[0][0], segment[0][1]),
+                    clipping.p(segment[1][0], segment[1][1])
+                ) for segment in segments]
+
+    clipped_segments = clipping.clip_unit_square(segments)
+
+    tuple_segments = [(
+                        (segment.a.x, segment.a.y),
+                        (segment.b.x, segment.b.y)
+                      ) for segment in clipped_segments]
+    write(TERMINAL,
+          SSH_HOST,
+          SSH_DIR,
+          job_id,
+          json.dumps(tuple_segments, indent=4))
 
 
 def write(terminal, host, file_dir, job_id, text):
@@ -52,16 +68,18 @@ def write(terminal, host, file_dir, job_id, text):
     sleep(2)
     pyautogui.typewrite('ssh ' + host + '\n')
     sleep(2)
-    pyautogui.hotkey('ctrl', 'd')
+#    pyautogui.hotkey('ctrl', 'd')
     pyautogui.typewrite("cd " + file_dir + '\n', interval=0.1)
     pyautogui.typewrite('vim ' + job_id + '\n', interval=0.1)
     sleep(1)
     pyautogui.typewrite('a')
-    pyautogui.press('capslock')
     for line in text.split('\n'):
+        if not ('[' in line or ']' in line):
+            pyautogui.press('capslock')
         pyautogui.typewrite(line)
         pyautogui.press('enter')
-    pyautogui.press('capslock')
+        if not ('[' in line or ']' in line):
+            pyautogui.press('capslock')
     pyautogui.press('esc')
     pyautogui.typewrite(':x')
     pyautogui.press('enter')
@@ -109,4 +127,4 @@ def listen():
                 job_id = job_selector.split("/")[1]
                 unit(segments, job_id)
 
-#listen()
+listen()
