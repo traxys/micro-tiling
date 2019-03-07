@@ -44,6 +44,8 @@ def clip_right(lines):
     """
     out = []
     for l in lines:
+        if l.a.x > 1:
+            continue
         if l.a.x == l.b.x:
             if l.a.x < 1:
                 out.append(l)
