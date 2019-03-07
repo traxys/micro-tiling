@@ -11,6 +11,7 @@ Welcome to Translator's documentation!
    :caption: Contents:
     
    translator
+   translator_service
 
 Indices and tables
 ==================
