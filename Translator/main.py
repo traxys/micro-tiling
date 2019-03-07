@@ -3,6 +3,7 @@ import pyinotify
 import json
 import os
 import gnupg
+import translator
 
 WATCH_DIR = '/home/traxys/unitator_files'
 SMTP_HOST = 'localhost'
@@ -11,6 +12,7 @@ SMTP_HOST = 'localhost'
 def translation(segments, job_id, gpg):
     """Creates replicas of the segments in the eight directions
     """
+    segments = translator.translation(segments, True)
     send(SMTP_HOST, segments, job_id, gpg)
 
 
