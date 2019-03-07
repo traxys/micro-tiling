@@ -58,15 +58,16 @@ def share_death():
 
 
 #talk if needed
+n_of_live_neighbours = n_of_neighbours
 while True:
-    if n_of_neighbours == 1:
+    if n_of_live_neighbours == 1:
         share_death()
     m = messages.read(1)
     # debug('received message : '+m+'\n')
     if m == 'd':
         debug("one of my neighbours died !\n")
-        n_of_neighbours -= 1
-        if n_of_neighbours == 0 or n_of_neighbours > 1:
+        n_of_live_neighbours -= 1
+        if n_of_live_neighbours == 0 or n_of_live_neighbours > 1:
             write_main.write('d')
             write_main.flush()
     elif m == 'e':
@@ -80,11 +81,8 @@ if n_of_neighbours > 1:
 
     for msg in write_neighbours:
         msg.write(own_pid+' '+' '.join(str(c) for c in position)+'\n')
-        try:
-            msg.flush()
-            msg.close()
-        except BrokenPipeError:
-            pass
+        msg.flush()
+        msg.close()
 
     res = open('result.svg', 'a')
     dead_processes = 0
@@ -104,17 +102,14 @@ if n_of_neighbours > 1:
 else:
     for msg in write_neighbours:
         msg.write('d\n')
-        try:
-            msg.flush()
-            msg.close()
-        except BrokenPipeError:
-            pass
+        msg.flush()
+        msg.close()
 
     # wait till every pipe writer closed their end before dying
     dead_processes = 0
     while dead_processes < n_of_neighbours:
         m = messages.readline()
-        if m == '\n' or len(m.split()) == 3:
+        if m == 'd\n' or len(m.split()) == 3:
             dead_processes += 1
 
 debug("And now I am dead.\n")

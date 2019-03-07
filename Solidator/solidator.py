@@ -153,6 +153,17 @@ if __name__ == "__main__":
     link(p3,p4)
     link(p2,p4)
     
-    
-    print(remove_deg_1([p1, p2, p3, p4, p5, p6]))
+    points = [p1, p2, p3, p4, p5, p6]
+    img = open('initial_img.svg','w')
+    img.write('<svg width="600" height="600">\n')
+    svg_scale = 100
+    svg_coord = lambda x: x*svg_scale + 3*svg_scale
+    for p in points:
+        for p2 in p.linked:
+            img.write('<line x1="{}" y1="{}" x2="{}" y2="{}" style="stroke:rgb(255,0,0)"/>\n'.format(svg_coord(p.pos.x), svg_coord(p.pos.y), svg_coord(p2.pos.x), svg_coord(p2.pos.y)))
+
+    img.write('</svg>\n')
+    img.flush()
+    img.close()
+    print(remove_deg_1(points))
 
