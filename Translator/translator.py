@@ -1,80 +1,53 @@
-#!/usr/bin/python
-import pyinotify
-import json
-import os
-import gnupg
+#! /usr/bin/python3
+import struct
+import subprocess
+import bf_interpreter
 
-WATCH_DIR = '/home/traxys/unitator_files'
-SMTP_HOST = 'localhost'
-
-
-def translation(segments, job_id, gpg):
-    """Creates replicas of the segments in the eight directions
+def encode(vect):
+    """Takes a **point** *vect* and converts it to six bytes
     """
-    send(SMTP_HOST, segments, job_id, gpg)
+    s = struct.pack('>i', int(vect[0] * 256 * 256 * 256))[:-1]
+    s += struct.pack('>i', int(vect[1] * 256 * 256 * 256))[:-1]
+    return s
 
 
-def encode(string):
-    """ Encode the *string* in the most frequent kanji encoding
+def decode(s):
+    """Takes six bytes *s* and returns a **point**
     """
-    f = open('kanji', "r")
-    kanji = json.loads(f.read())
-    return ''.join(map(lambda c: kanji[ord(c)], string))
+    x = struct.unpack('>i', s[:3]+b'\x00')[0]/256./256/256
+    y = struct.unpack('>i', s[3:6]+b'\x00')[0]/256./256/256
+    return (x, y)
+
+def decode_nine(s):
+    return [decode(s[6*i:6*(i+1)]) for i in range(9)]
 
 
-def encrypt(string, gpg):
-    """ Encrypt the *string* in pgp encoded using the context *gpg*
+def go_through_brainfuck(file_name, point, use_python=False):
+    """ passes *points* throught the brainfuck file *file_name*
     """
-    enc = gpg.encrypt(string.encode(), gpg.list_keys()[0]['fingerprint'])
-    return str(enc)
+    encoded = encode(point)
+    if use_python:
+        input_list = list(encoded)
+        interpreter = bf_interpreter.Interpret(file_name,
+                                               mem_size=256,
+                                               get_input=lambda: chr(input_list
+                                                                     .pop(0)))
+        out = interpreter.get_output(6)
+    else:
+        p = subprocess.Popen(['bf', file_name],
+                             stdout=subprocess.PIPE,
+                             stdin=subprocess.PIPE)
+        out, err = p.communicate(input=encode(point))
+    return decode_nine(out)
+
+def translate_segments(segments, use_python=False):
+    out = []
+    for s in segments:
+        pointsa = go_through_brainfuck('translator.bf', s[0], use_python)
+        pointsb = go_through_brainfuck('translator.bf', s[1], use_python)
+        out += list(zip(pointsa, pointsb))
+    return out
 
 
-def send(host, segments, job_id, gpg):
-    """Sends the encoded *segments* to the next service by smtp
-    throught *host* encrypted using the *gpg* context
-    """
-    import smtplib
-
-    sender = "translator@micro-tiling.tk"
-    receivers = ["cruxingator@micro-tiling.tk"]
-    message = """From: {}
-    To: {}
-    Subject: {}
-
-    """.format(sender, receivers[0], job_id)
-    message += encode(json.dumps(segments)) + "\n"
-    message = encrypt(message, gpg)
-    smtpObj = smtplib.SMTP(host)
-
-    smtpObj.sendmail(sender, receivers, message.encode())
-
-
-def listen(watch_dir):
-    """Listen for new files in *watch_dir* and reads them, translates the
-    segments and forwards them
-    """
-    wm = pyinotify.WatchManager()
-    mask = pyinotify.IN_CREATE
-
-    gpg = gnupg.GPG(gnupghome='.')
-    pub_file = open("../keys/pub.gpg", "r")
-    gpg.import_keys(pub_file.read())
-    pub_file.close()
-    gpg.trust_keys("032F62203EC4B1A332D54B93932CE0D477126DC5",
-                   "TRUST_ULTIMATE")
-
-    class EventHandler(pyinotify.ProcessEvent):
-        def process_IN_CREATE(self, event):
-            segment_file = open(event.pathname, "r")
-            segments = json.loads(segment_file.read())
-            segment_file.close()
-            translation(segments, event.name, gpg)
-            os.remove(event.pathname)
-
-    handler = EventHandler()
-    notifier = pyinotify.Notifier(wm, handler)
-
-    wm.add_watch(watch_dir, mask)
-    notifier.loop()
-
-listen(WATCH_DIR)
+if __name__ == "__main__":
+    print(translate_segments([[[1,1],[0,0]]]))
