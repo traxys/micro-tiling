@@ -177,6 +177,10 @@ def create_app(test_config=None):
 
     pi = [str(d) for d in make_pi(MAX_PI)]
 
+    @app.route('/health', methods=('GET',))
+    def health():
+        return 'ok'
+
     @app.route('/', methods=('POST',))
     def hello():
         valid = [str(i) for i in range(0, 10)]

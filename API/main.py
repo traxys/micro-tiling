@@ -80,6 +80,10 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    @app.route('/health', methods=('GET',))
+    def health():
+        return 'ok'
+
     @app.route('/<string:job_id>/state', methods=('GET',))
     def get_state(job_id):
         db = get_db()
