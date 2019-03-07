@@ -19,10 +19,7 @@ import mill_pb2_grpc
 import segment_generator
 
 MAX_PI = 1000
-MILLLLLLLL_ADDR = os.environ['MILLLLLLLL_HOST'] + \
-                  ':' + \
-                  os.environ['MILLLLLLLL_PORT']
-
+MILLLLLLLL_ADDR = os.environ['MILLLLLLLL_ADDR']
 
 def get_db():
     """Get the db associated with the application
