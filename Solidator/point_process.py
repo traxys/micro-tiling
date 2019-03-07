@@ -80,16 +80,16 @@ if n_of_neighbours > 1:
 
     for msg in write_neighbours:
         msg.write(own_pid+' '+' '.join(str(c) for c in position)+'\n')
-        msg.flush()
-        msg.close()
+        try:
+            msg.flush()
+            msg.close()
+        except BrokenPipeError:
+            pass
 
     res = open('result.svg', 'a')
     dead_processes = 0
     while dead_processes < n_of_neighbours:
-        try:
-            m = messages.readline()
-        except BrokenPipeError:
-            break
+        m = messages.readline()
         if m != '':
             if m == 'd\n':
                 dead_processes += 1
@@ -104,16 +104,16 @@ if n_of_neighbours > 1:
 else:
     for msg in write_neighbours:
         msg.write('d\n')
-        msg.flush()
-        msg.close()
+        try:
+            msg.flush()
+            msg.close()
+        except BrokenPipeError:
+            pass
 
     # wait till every pipe writer closed their end before dying
     dead_processes = 0
     while dead_processes < n_of_neighbours:
-        try:
-            m = messages.readline()
-        except BrokenPipeError:
-            break
+        m = messages.readline()
         if m == '\n' or len(m.split()) == 3:
             dead_processes += 1
 
