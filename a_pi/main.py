@@ -21,10 +21,7 @@ import mill_pb2_grpc
 import segment_generator
 
 MAX_PI = 1000
-MILLLLLLLL_ADDR = os.environ['MILLLLLLLL_HOST'] + \
-                  ':' + \
-                  os.environ['MILLLLLLLL_PORT']
-
+MILLLLLLLL_ADDR = os.environ['MILLLLLLLL_ADDR']
 
 def get_db():
     """Get the db associated with the application
@@ -175,6 +172,10 @@ def create_app(test_config=None):
     mill_stub = mill_pb2_grpc.MillStub(channel)
 
     pi = [str(d) for d in make_pi(MAX_PI)]
+
+    @app.route('/health', methods=('GET',))
+    def health():
+        return 'ok'
 
     @app.route('/', methods=('POST',))
     def hello():
