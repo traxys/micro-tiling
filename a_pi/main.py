@@ -13,6 +13,8 @@ from werkzeug.exceptions import abort
 
 import grpc
 
+import threading
+
 import mill_pb2
 import mill_pb2_grpc
 
@@ -127,12 +129,12 @@ def terminate(db, job_id, mill_stub):
                         x=s['x2'],
                         y=s['y2'])) for s in segments]
 
-    mill_stub.Turn(
-        mill_pb2.Job(
-            id=job_id,
-            segments=segments,
-        )
-    )
+    t = threading.Thread(target=mill_stub.Turn,
+                         args=(mill_pb2.Job(
+                                id=job_id,
+                                segments=segments,
+                            ), ))
+    t.start()
 
     db.execute(
         'DELETE FROM job'
