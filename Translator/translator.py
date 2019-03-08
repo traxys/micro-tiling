@@ -36,7 +36,7 @@ def go_through_brainfuck(file_name, point, use_python=False):
                                                mem_size=256,
                                                get_input=lambda: chr(input_list
                                                                      .pop(0)))
-        out = interpreter.get_output(6)
+        out = interpreter.get_output(6*9)
     else:
         p = subprocess.Popen(['bf', file_name],
                              stdout=subprocess.PIPE,
@@ -57,4 +57,4 @@ def translate_segments(segments, use_python=False):
 
 
 if __name__ == "__main__":
-    print(translate_segments([[[1,1],[0,0]]]))
+    print(translate_segments([[[1,1],[0,0]]], True))
