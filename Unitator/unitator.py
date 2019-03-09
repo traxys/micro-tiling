@@ -11,9 +11,6 @@ from selenium import webdriver
 GOPHER_IP = '127.0.0.1'
 GOPHER_PORT = 3333
 
-SSH_HOST = "localhost"
-SSH_DIR = "unitator_files"
-
 TCP_PORT = 1337
 TCP_IP = '127.0.0.1'
 
