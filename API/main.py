@@ -44,7 +44,18 @@ def run_transaction(conn, op):
 
 
 def get_public_state(state):
-    return "started"
+    if state == -1:
+        return "error"
+    elif state == 0:
+        return "started"
+    elif state <= 3:
+        return "generating segments"
+    elif state <= 7:
+        return "rotating segments"
+    elif state <= 12:
+        return "clipping segments"
+    elif state <= 19:
+        return "translating segments"
 
 
 def init_db():
