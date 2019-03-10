@@ -1,7 +1,10 @@
-FROM alpine:latest
-RUN apk add grpc
+FROM jfloff/alpine-python:latest
+
+RUN pip3 install grpcio
+RUN pip3 install protobuf
 
 WORKDIR olala
 COPY . .
 
-RUN sh build.sh
+EXPOSE 5001 3333
+CMD [ "./init.sh" ]
