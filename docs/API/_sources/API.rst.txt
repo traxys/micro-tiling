@@ -1,0 +1,4 @@
+Micro Tiling API
+================
+
+.. swaggerv2doc:: file:///home/traxys/python/micro-tiling/API/swagger.json
