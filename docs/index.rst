@@ -11,6 +11,7 @@ Welcome to Micro Tiling's documentation!
    :caption: Contents:
 
    API/index
+   a_pi/index
 
 Indices and tables
 ==================
