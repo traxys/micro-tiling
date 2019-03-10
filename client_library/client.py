@@ -1,4 +1,6 @@
 #!/bin/python3
+""" Module to generate mosaics using micro-tiling
+"""
 
 import requests
 import json
@@ -6,11 +8,18 @@ import time
 
 
 def launch_job(host):
+    """Create a job for *host* and returns the **job_id**
+    """
     r = requests.post(host)
     return json.loads(r.text)["id"]
 
 
 def manage_state(host, ensicoin_adress, result):
+    """Iterator on the completion of a job generation at *host*,
+    using the *ensicoin_adress* as needed.
+
+    Writes the mosaic in the list *result*
+    """
     job_id = launch_job(host)
     while True:
         state = json.loads(requests.get(
@@ -27,10 +36,12 @@ def manage_state(host, ensicoin_adress, result):
 
 
 def generate_mosaic(host, ensicoin_address):
+    """Wraps **manage_state** to return a result
+    """
     result = []
     for _ in manage_state(host, ensicoin_address, result):
         pass
-    return result
+    return result[0]
 
 
 if __name__ == "__main__":
