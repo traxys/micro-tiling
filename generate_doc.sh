@@ -5,7 +5,7 @@ mkdir -p doc/golfer
 cp -r Millllllll/gopher/build/html/* doc/golfer
 
 
-for service in API a_pi Millllllll client_library Unitator
+for service in API a_pi Millllllll client_library Unitator Translator
 do
 	make -C $service html
 	mkdir -p doc/$service
