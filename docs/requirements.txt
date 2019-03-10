@@ -1,6 +1,7 @@
 alabaster==0.7.12
 appdirs==1.4.3
 Babel==2.6.0
+psycopg2==2.7.7
 CacheControl==0.12.5
 chardet==3.0.4
 Click==7.0
