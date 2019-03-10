@@ -1,0 +1,12 @@
+version: 2
+
+python:
+  version: 3.7
+  install:
+     - method: pip
+       path: Flask
+     - method: pip
+       path: grpcio
+     - method: pip
+       path: protobuf
+  system_packages: true
