@@ -1,4 +1,4 @@
-Welcome to Micro-Tiling REST API's documentation!
+Micro-Tiling REST API
 ============================================
 
 .. toctree::

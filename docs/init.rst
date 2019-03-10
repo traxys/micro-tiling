@@ -1,5 +1,5 @@
 Job Init Reference
 ==============
 
-.. automodule:: API.init
+.. automodule:: API/init
     :members:
