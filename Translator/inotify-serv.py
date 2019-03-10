@@ -5,14 +5,14 @@ import os
 import gnupg
 import translator
 
-WATCH_DIR = '/home/traxys/unitator_files'
+WATCH_DIR = 'jobs'
 SMTP_HOST = 'localhost'
 
 
 def translation(segments, job_id, gpg):
     """Creates replicas of the segments in the eight directions
     """
-    segments = translator.translation(segments, True)
+    segments = translator.translate_segments(segments, True)
     send(SMTP_HOST, segments, job_id, gpg)
 
 
@@ -59,7 +59,7 @@ def listen(watch_dir):
     mask = pyinotify.IN_CREATE
 
     gpg = gnupg.GPG(gnupghome='.')
-    pub_file = open("../keys/pub.gpg", "r")
+    pub_file = open("keys/pub.gpg", "r")
     gpg.import_keys(pub_file.read())
     pub_file.close()
     gpg.trust_keys("032F62203EC4B1A332D54B93932CE0D477126DC5",
