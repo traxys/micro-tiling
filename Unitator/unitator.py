@@ -109,4 +109,6 @@ def listen():
                 job_id = job_selector.split("/")[1]
                 unit(segments, job_id)
 
-listen()
+
+if __name__ == "__main__":
+    listen()

@@ -64,4 +64,6 @@ def serve():
     except KeyboardInterrupt:
         server.stop(0)
 
-serve()
+
+if __name__ == "__main__":
+    serve()

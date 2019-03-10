@@ -100,4 +100,6 @@ def main():
                     selected_file.close()
         conn.close()
 
-main()
+
+if __name__ == "__main__":
+    main()
