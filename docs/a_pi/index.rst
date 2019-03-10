@@ -1,16 +1,16 @@
-.. Micro Tiling documentation master file, created by
-   sphinx-quickstart on Sun Mar 10 16:57:27 2019.
+.. a_pi documentation master file, created by
+   sphinx-quickstart on Tue Mar  5 02:07:30 2019.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Micro Tiling's documentation!
-========================================
+a_pi 
+====
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
-
-   API/index
+   
+   segment_generator
+   flask_application
 
 Indices and tables
 ==================
@@ -18,3 +18,4 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
