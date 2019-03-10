@@ -1,21 +1,18 @@
 #!/usr/bin/python
 import socket
 import json
-import pyautogui
 import subprocess
 from time import sleep
 import clipping
 
+from pyvirtualdisplay import Display
+from selenium import webdriver
+
 GOPHER_IP = '127.0.0.1'
 GOPHER_PORT = 3333
 
-SSH_HOST = "localhost"
-SSH_DIR = "unitator_files"
-
 TCP_PORT = 1337
 TCP_IP = '127.0.0.1'
-
-TERMINAL = "/usr/bin/kitty"
 
 
 def recv_data(conn):
@@ -52,39 +49,24 @@ def unit(segments, job_id):
                         (segment.a.x, segment.a.y),
                         (segment.b.x, segment.b.y)
                       ) for segment in clipped_segments]
-    write(TERMINAL,
-          SSH_HOST,
-          SSH_DIR,
-          job_id,
+    write(job_id,
           json.dumps(tuple_segments, indent=4))
 
 
-def write(terminal, host, file_dir, job_id, text):
-    """Writes a *text* by ssh to the *host*,
-    in the directory *file_dir* in a file named *job_id*
-    using the *terminal* provided
+def write(job_id, text):
+    """Writes a *text* by a html form
     """
-    subprocess.Popen(terminal)
-    sleep(2)
-    pyautogui.typewrite('ssh ' + host + '\n')
-    sleep(2)
-#    pyautogui.hotkey('ctrl', 'd')
-    pyautogui.typewrite("cd " + file_dir + '\n', interval=0.1)
-    pyautogui.typewrite('vim ' + job_id + '\n', interval=0.1)
-    sleep(1)
-    pyautogui.typewrite('a')
-    for line in text.split('\n'):
-        if not ('[' in line or ']' in line):
-            pyautogui.press('capslock')
-        pyautogui.typewrite(line)
-        pyautogui.press('enter')
-        if not ('[' in line or ']' in line):
-            pyautogui.press('capslock')
-    pyautogui.press('esc')
-    pyautogui.typewrite(':x')
-    pyautogui.press('enter')
-    pyautogui.typewrite("exit\n")
-    pyautogui.typewrite("exit\n")
+    display = Display(visible=0, size=(1024, 768))
+    display.start()
+
+    browser = webdriver.Firefox()
+    actions = webdriver.ActionChains(browser)
+    browser.get("file:///app/test.html")
+    message = browser.find_element_by_name("message")
+    message.send_keys(text)
+    job = browser.find_element_by_name("job")
+    job.send_keys(job_id)
+    job.submit()
 
 
 def listen():
