@@ -1,5 +1,5 @@
-Micro-Tiling REST API
-=====================
+REST API
+========
 
 .. toctree::
    :maxdepth: 2

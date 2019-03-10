@@ -10,8 +10,14 @@ Welcome to Micro Tiling's documentation!
    :maxdepth: 3
    :caption: Contents:
 
+   bf_interpreter
+   golfer/index
+   client_library/index
    API/index
    a_pi/index
+   Millllllll/index
+   Unitator/index
+   Translator/index
 
 Indices and tables
 ==================
