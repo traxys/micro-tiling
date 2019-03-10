@@ -1,13 +1,13 @@
 #! /usr/bin/python3
 '''
-processes are sent the PIDs of their neighbours at start
+processes are sent the IDs of their neighbours at start
 once they have them, they start telling others if they have a degree of 1
 and they listen for neighbours signaling they have a degree of 1
 '''
-# I want that process to be able to handle signals as soon as possible
 import sys
 
 svg_scale = 100
+line_blueprint = '<line x1="{}" y1="{}" x2="{}" y2="{}" style="stroke:rgb(255,0,0)"/>\n'
 
 n_of_neighbours = int(sys.argv[1])
 own_id = int(sys.argv[2])
@@ -17,6 +17,8 @@ write_main = open('msg_main', 'w')
 messages = open('msg_'+str(own_id), 'r')
 
 def debug(string):
+    '''write in stderr and add the point id for clarity
+    '''
     sys.stderr.write('('+str(own_id)+') '+string)
     sys.stderr.flush()
 
@@ -90,15 +92,10 @@ while not(end) or dead_processes < n_of_neighbours:
             svg_coord = lambda x: x*svg_scale + 3*svg_scale
             point_id = int(m.split()[1])
             if point_id > int(own_id):
-                res.write('<line x1="{}"\
-                                 y1="{}"\
-                                 x2="{}"\
-                                 y2="{}"\
-                                 style="stroke:rgb(255,0,0)"\
-                                 />\n'.format(svg_coord(position[0]),
-                                              svg_coord(position[1]),
-                                              svg_coord(float(m.split()[2])),
-                                              svg_coord(float(m.split()[3]))))
+                res.write(line_blueprint.format(svg_coord(position[0]),
+                                                svg_coord(position[1]),
+                                                svg_coord(float(m.split()[2])),
+                                                svg_coord(float(m.split()[3]))))
                 res.flush()
                 debug('writing line from '+str(own_id)+' to '+str(point_id)+'\n')
 
