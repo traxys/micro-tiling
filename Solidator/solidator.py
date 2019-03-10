@@ -53,7 +53,7 @@ class Point:
 
 
 def open_process(point):
-    proc = subprocess.Popen([abspath('./point_process.py'), str(len(point.linked)), str(getpid())], stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = sys.stdout)
+    proc = subprocess.Popen([abspath('./point_process.py'), str(len(point.linked)), str(point.id)], stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = sys.stdout)
     return proc
 
 def remove_deg_1(points, multithread = True):
@@ -61,6 +61,11 @@ def remove_deg_1(points, multithread = True):
         system('rm msg_*')
         mkfifo('msg_main')
         number_deg1 = 0
+
+        for i,p in enumerate(points):
+            p.id = i
+            mkfifo('msg_'+str(p.id))
+
         for p in points:
             if len(p.linked) == 1:
                 number_deg1 += 1
@@ -68,11 +73,8 @@ def remove_deg_1(points, multithread = True):
         messages = open('msg_main', 'r')
 
         for p in points:
-            try:
-                mkfifo('msg_'+str(p.proc.pid))
-            except FileExistsError:
-                pass
-            p.msg = open('msg_'+str(p.proc.pid), 'w')
+            p.msg = open('msg_'+str(p.id), 'w')
+
 
         unprepared_processes = len(points)
         while unprepared_processes:
@@ -84,7 +86,7 @@ def remove_deg_1(points, multithread = True):
         for p in points:
             p.proc.stdin.write(bytes(str(p.pos.x)+' '+str(p.pos.y), 'utf-8')+b'\n')
             for neighbour in p.linked:
-                p.proc.stdin.write(bytes(str(neighbour.proc.pid), 'utf-8')+b'\n')
+                p.proc.stdin.write(bytes(str(neighbour.id), 'utf-8')+b'\n')
                 p.proc.stdin.flush()
         
 
@@ -100,7 +102,7 @@ def remove_deg_1(points, multithread = True):
         res.flush()
         res.close()
         for p in points:
-            p.msg.write('e')#tell them it is the end
+            p.msg.write('e\n')#tell them it is the end
             p.msg.flush()
             p.msg.close()
 
