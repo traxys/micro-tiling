@@ -6,10 +6,3 @@ Micro-Tiling REST API
    :caption: Contents:
 
    init
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

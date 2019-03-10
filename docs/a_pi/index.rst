@@ -12,10 +12,3 @@ a_pi
    segment_generator
    flask_application
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-

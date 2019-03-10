@@ -14,7 +14,10 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, os.path.abspath("../a_pi"))
+# sys.path.insert(0, path / 'API')
+# sys.path.insert(0, path / 'a_pi')
 
 
 # -- Project information -----------------------------------------------------
