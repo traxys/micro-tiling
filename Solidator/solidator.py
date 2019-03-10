@@ -1,27 +1,37 @@
 #! /usr/bin/python3
 from math import sqrt
-import subprocess, signal
+import subprocess
 from os.path import abspath
 from os import getpid, mkfifo, system
 from time import sleep
 import sys
 
+
 class Vect:
+    """A two dimensional vector
+    """
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
     def __abs__(self):
         return sqrt(self.x * self.x + self.y * self.y)
+
     def __add__(self, other):
         return Vect(self.x + other.x, self.y + other.y)
+
     def __sub__(self, other):
         return Vect(self.x - other.x, self.y - other.y)
+
     def __mul__(self, other):
         return Vect(self.x * other, self.y * other)
+
     def __rmul__(self, other):
         return self * other
+
     def __div__(self, other):
         return Vect(self.x / other, self.y / other)
+
     def __rdiv__(self, other):
         return self / other
 
@@ -30,23 +40,36 @@ class Vect:
 
 
 class Segment:
+    """A segment of two vectors
+    """
     def __init__(self, a, b):
         self.a = a
         self.b = b
+
     def __abs__(self):
         return abs(self.b - self.a)
 
+
 class Point:
+    """ A two dimensional point whose *pos* is a **Vect**
+    """
     def __init__(self, pos):
         '''
         pos is a Vect
         '''
         self.pos = pos
         self.linked = []
+
     def merge(self, other):
+        """Merges with another **Point**
+        """
         self.linked += other.linked
-    def get_pos(self, precision = 1e-10):
-        return (int(self.pos.x/precision)*precision,  int(self.pos.y/precision)*precision)
+
+    def get_pos(self, precision=1e-10):
+        """Returns an position up to *precision*
+        """
+        return (int(self.pos.x/precision)*precision,
+                int(self.pos.y/precision)*precision)
 
     def __repr__(self):
         return 'Point('+str(self.pos.x)+', '+str(self.pos.y)+')'
@@ -56,10 +79,16 @@ def open_process(point):
     '''opens a process representing a *point*
     tells it how many neighbours it should expect and its *point* *id*
     '''
-    proc = subprocess.Popen([abspath('./point_process.py'), str(len(point.linked)), str(point.id)], stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = sys.stdout)
+    proc = subprocess.Popen([abspath('./point_process.py'),
+                             str(len(point.linked)),
+                             str(point.id)],
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE,
+                            stderr=sys.stdout)
     return proc
 
-def remove_deg_1(points, multiprocess = True):
+
+def remove_deg_1(points, multiprocess=True):
     '''write an svg with only closed polygons displayed
     '''
     if multiprocess:
@@ -69,9 +98,9 @@ def remove_deg_1(points, multiprocess = True):
         number_deg1 = 0
 
         # create named pipes necessary for communication
-        for i,p in enumerate(points):
+        for i, p in enumerate(points):
             p.id = i
-            mkfifo('msg_'+str(p.id))
+            mkfifo('msg_' + str(p.id))
 
         # open one process for each point
         # (and count the number of points of degree 1)
@@ -83,12 +112,12 @@ def remove_deg_1(points, multiprocess = True):
 
         # open communication pipes for each process
         for p in points:
-            p.msg = open('msg_'+str(p.id), 'w')
+            p.msg = open('msg_' + str(p.id), 'w')
 
         # wait untill every process has finished starting up
         unprepared_processes = len(points)
         while unprepared_processes:
-            print('waiting for '+str(unprepared_processes)+' processes')
+            print('waiting for ' + str(unprepared_processes) + ' processes')
             m = messages.read(1)
             if m == 'r':
                 unprepared_processes -= 1
@@ -96,17 +125,19 @@ def remove_deg_1(points, multiprocess = True):
         # tell each process the position of the point they represent
         # and the id of their neighbours
         for p in points:
-            p.proc.stdin.write(bytes(str(p.pos.x)+' '+str(p.pos.y), 'utf-8')+b'\n')
+            p.proc.stdin.write(bytes(str(p.pos.x) +
+                                     ' ' +
+                                     str(p.pos.y),
+                                     'utf-8') + b'\n')
             for neighbour in p.linked:
-                p.proc.stdin.write(bytes(str(neighbour.id), 'utf-8')+b'\n')
+                p.proc.stdin.write(bytes(str(neighbour.id), 'utf-8') + b'\n')
                 p.proc.stdin.flush()
-        
 
         # wait for all points of degree 1 to be deleted
         # (associated processes are still running,
         # they just know they shouldn't be displayed on the result)
         while number_deg1:
-            print('deg1 left :',number_deg1)
+            print('deg1 left :', number_deg1)
             m = messages.read(1)
             if m == 'd':
                 number_deg1 -= 1
