@@ -11,7 +11,7 @@ Welcome to Translator's documentation!
    :caption: Contents:
     
    translator
-   translator_service
+   inotify-serv
 
 Indices and tables
 ==================

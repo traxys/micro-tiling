@@ -1,5 +1,5 @@
 Translator Service
 ==================
 
-.. automodule:: main
+.. automodule:: inotify-serv
     :members:
