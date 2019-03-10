@@ -1,5 +1,6 @@
 import random
 import requests
+import database
 
 
 def make_pi(total):
@@ -26,6 +27,7 @@ def generate_segments(job_id, address):
     """Generate segments for *job_id* using a_pi at host at *address*
     """
     pi = make_pi(random.randint(MIN_SEGMENT, MAX_SEGMENT))
+    database.update_state(database.open_db(), 1, job_id)
 
     for digit in pi:
         payload = {'digit': str(digit), 'job': job_id}

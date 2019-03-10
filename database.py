@@ -41,3 +41,21 @@ def run_transaction(conn, op):
                 # Signal the database that we'll retry.
                 onestmt(conn,
                         "ROLLBACK TO SAVEPOINT cockroach_restart")
+
+
+def update_state(db, new_state, job_id):
+    with db.cursor() as cur:
+        current_state = cur.execute(
+                'SELECT state FROM jobs WHERE jobs.id = ?',
+                (job_id,)
+        ).fetchone()
+
+    if current_state is not None:
+        if current_state < new_state:
+            def update_db(cur):
+                cur.execute(
+                        'UPDATE jobs SET state = ?',
+                        ' WHERE jobs.id = ?',
+                        (new_state, job_id)
+                )
+            run_transaction(db, update_db)
