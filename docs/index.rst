@@ -19,6 +19,7 @@ Welcome to Micro Tiling's documentation!
    Millllllll/index
    Unitator/index
    Translator/index
+   Cruxingator/index
 
 Indices and tables
 ==================
