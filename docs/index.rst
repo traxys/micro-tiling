@@ -11,6 +11,7 @@ Welcome to Micro Tiling's documentation!
    :caption: Contents:
 
    bf_interpreter
+   database
    golfer/index
    client_library/index
    API/index

@@ -4,7 +4,7 @@ import psycopg2.errorcodes
 
 
 def open_db():
-    """Opens tho database
+    """Opens the database
     """
     return psycopg2.connect(
             database=os.environ['DB_NAME'] or 'microtiling',
@@ -44,6 +44,9 @@ def run_transaction(conn, op):
 
 
 def update_state(db, new_state, job_id):
+    """Update the state in *db* for the job *job_id*
+    if it is less than *new_state*
+    """
     with db.cursor() as cur:
         current_state = cur.execute(
                 'SELECT state FROM jobs WHERE jobs.id = ?',
