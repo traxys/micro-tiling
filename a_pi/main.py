@@ -3,6 +3,7 @@
 """Flask a_pi executing an action on each digit of pi sent
 """
 
+import database
 import sqlite3
 import os
 import click
@@ -99,6 +100,7 @@ def action(db, job_id, job_current):
     .. _segment generation: segment_generator.html#\
                             segment_generator.random_segment
     """
+
     db.execute(
         'UPDATE job SET digits = ?'
         ' WHERE id = ?',
@@ -115,6 +117,8 @@ def action(db, job_id, job_current):
 def terminate(db, job_id, mill_stub):
     """Finishes the job *job_id* and forwards it to the *mill_stub*
     """
+    database.update_state(database.open_db(), 2, job_id)
+
     segments = db.execute(
         'SELECT x1, y1, x2, y2 FROM segment'
         ' WHERE job_id = ?',
@@ -134,6 +138,7 @@ def terminate(db, job_id, mill_stub):
                                 id=job_id,
                                 segments=segments,
                             ), ))
+    database.update_state(database.open_db(), 3, job_id)
     t.start()
 
     db.execute(

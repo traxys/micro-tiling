@@ -1,6 +1,7 @@
 """gRPC server to rotate segments
 """
 
+import database
 import time
 from concurrent import futures
 import grpc
@@ -43,10 +44,19 @@ class MillServicer(mill_pb2_grpc.MillServicer):
     def Turn(self, request, context):
         """Turns segments contained in the RPC message *request*
         """
+        status_db = database.open_db()
+        database.update_state(status_db, 4, request.id)
+
         segments = MessageToDict(request)["segments"]
         segments = list(map(segment_to_tuple, segments))
+
+        database.update_state(status_db, 5, request.id)
         rotated_segments = rotate.mirror_and_turn_segments(segments, True)
+        database.update_state(status_db, 6, request.id)
+
         write(json.dumps(list(rotated_segments)), request.id)
+        database.update_state(status_db, 7, request.id)
+
         return mill_pb2.Response()
 
 

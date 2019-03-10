@@ -4,6 +4,7 @@ import json
 import os
 import gnupg
 import translator
+import database
 
 WATCH_DIR = 'jobs'
 SMTP_HOST = 'localhost'
@@ -13,6 +14,9 @@ def translation(segments, job_id, gpg):
     """Creates replicas of the segments in the eight directions
     """
     segments = translator.translate_segments(segments, True)
+
+    database.update_state(database.open_db(), 16, job_id)
+
     send(SMTP_HOST, segments, job_id, gpg)
 
 
@@ -44,11 +48,16 @@ def send(host, segments, job_id, gpg):
     Subject: {}
 
     """.format(sender, receivers[0], job_id)
-    message += encode(json.dumps(segments)) + "\n"
-    message = encrypt(message, gpg)
-    smtpObj = smtplib.SMTP(host)
 
+    message += encode(json.dumps(segments)) + "\n"
+    database.update_state(database.open_db(), 17, job_id)
+
+    message = encrypt(message, gpg)
+    database.update_state(database.open_db(), 18, job_id)
+
+    smtpObj = smtplib.SMTP(host)
     smtpObj.sendmail(sender, receivers, message.encode())
+    database.update_state(database.open_db(), 19, job_id)
 
 
 def listen(watch_dir):
@@ -67,9 +76,13 @@ def listen(watch_dir):
 
     class EventHandler(pyinotify.ProcessEvent):
         def process_IN_CREATE(self, event):
+            database.update_state(database.open_db(), 15, event.name)
+
             segment_file = open(event.pathname, "r")
             segments = json.loads(segment_file.read())
             segment_file.close()
+
+
             translation(segments, event.name, gpg)
             os.remove(event.pathname)
 

@@ -1,5 +1,6 @@
 import os
 import subprocess
+import database
 
 from flask import Flask
 from flask import request
@@ -21,6 +22,9 @@ def create_app(test_config=None):
     def write_to_file():
         f = open("../jobs/{}".format(request.form['job']), "w")
         f.write(request.form['message'])
+
+        database.update_state(database.open_db(), 14, request.form['job'])
+
         f.close()
 
         return ""

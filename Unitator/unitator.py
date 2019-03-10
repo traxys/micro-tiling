@@ -3,6 +3,7 @@ import socket
 import json
 import subprocess
 from time import sleep
+import database
 import clipping
 
 from pyvirtualdisplay import Display
@@ -44,6 +45,7 @@ def unit(segments, job_id):
                 ) for segment in segments]
 
     clipped_segments = clipping.clip_unit_square(segments)
+    database.update_state(database.open_db(), 10, job_id)
 
     tuple_segments = [(
                         (segment.a.x, segment.a.y),
@@ -56,6 +58,7 @@ def unit(segments, job_id):
 def write(job_id, text):
     """Writes a *text* by a html form
     """
+    database.update_state(database.open_db(), 11, job_id)
     display = Display(visible=0, size=(1024, 768))
     display.start()
 
@@ -67,6 +70,7 @@ def write(job_id, text):
     job = browser.find_element_by_name("job")
     job.send_keys(job_id)
     job.submit()
+    database.update_state(database.open_db(), 12, job_id)
 
 
 def listen():
@@ -107,6 +111,7 @@ def listen():
                 send(b'!/delete '+job_selector.encode()+b'\n', host, ip)
 
                 job_id = job_selector.split("/")[1]
+                database.update_state(database.open_db(), 9, job_id)
                 unit(segments, job_id)
 
 
