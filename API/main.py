@@ -18,7 +18,18 @@ A_PI_ADDRESS = os.environ['A_PI_ADDRESS'] or 'http://localhost:5000'
 
 
 def get_public_state(state):
-    return "started"
+    if state == -1:
+        return "error"
+    elif state == 0:
+        return "started"
+    elif state <= 3:
+        return "generating segments"
+    elif state <= 7:
+        return "rotating segments"
+    elif state <= 12:
+        return "clipping segments"
+    elif state <= 19:
+        return "translating segments"
 
 
 def init_db():
