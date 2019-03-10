@@ -38,8 +38,10 @@ if __name__ == "__main__":
 
     def wrap_bar(host, ensicoin_address):
         bar = progressbar.ProgressBar(max_value=100,
-                                      widgets=["generating mosaic :",
-                                               progressbar.Bar()])
+                                      widgets=["generating mosaic : ",
+                                               progressbar.Bar(),
+                                               progressbar.Timer()])
+        bar.start()
         result = []
         for completion in manage_state(
                             host,
