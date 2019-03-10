@@ -1,6 +1,5 @@
 import os
-import psycopg2
-import psycopg2.errorcodes
+import sqlite3
 import string
 import random
 from flask import Flask
@@ -18,31 +17,6 @@ MAX_STATE = 42
 A_PI_ADDRESS = os.environ['A_PI_ADDRESS'] or 'http://localhost:5000'
 
 
-def onestmt(conn, sql):
-    with conn.cursor() as cur:
-        cur.execute(sql)
-
-
-def run_transaction(conn, op):
-    with conn:
-        onestmt(conn, "SAVEPOINT cockroach_restart")
-        while True:
-            try:
-                # Attempt the work.
-                op(conn)
-
-                # If we reach this point, commit.
-                onestmt(conn, "RELEASE SAVEPOINT cockroach_restart")
-                break
-
-            except psycopg2.OperationalError as e:
-                if e.pgcode != psycopg2.errorcodes.SERIALIZATION_FAILURE:
-                    # A non-retryable error; report this up the call stack.
-                    raise e
-                # Signal the database that we'll retry.
-                onestmt(conn, "ROLLBACK TO SAVEPOINT cockroach_restart")
-
-
 def get_public_state(state):
     return "started"
 
@@ -51,7 +25,7 @@ def init_db():
     db = get_db()
 
     with current_app.open_resource('schema.sql') as f:
-        run_transaction(db, lambda conn: conn.cursor().execute(f.read().decode('utf8')))
+        db.executescript(f.read().decode('utf8'))
 
 
 @click.command('init-db')
@@ -64,12 +38,11 @@ def init_db_command():
 
 def get_db():
     if 'db' not in g:
-        g.db = psycopg2.connect(
-            database=os.environ['DB_NAME'] or 'microtiling',
-            user=os.environ['DB_USER'] or 'microtiling',
-            port=os.environ['DB_PORT'] or 26257,
-            host=os.environ['DB_HOST'] or 'localhost'
+        g.db = sqlite3.connect(
+            current_app.config['DATABASE'],
+            detect_types=sqlite3.PARSE_DECLTYPES
         )
+        g.db.row_factory = sqlite3.Row
 
     return g.db
 
@@ -90,7 +63,8 @@ def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        SECRET_KEY='dev'
+        SECRET_KEY='dev',
+        DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
     )
 
     init_app(app)
@@ -115,79 +89,55 @@ def create_app(test_config=None):
     @app.route('/<string:job_id>/state', methods=('GET',))
     def get_state(job_id):
         db = get_db()
-        
-        state = None
-
-        with db.cursor() as cur:
-            state = cur.execute(
+        state = db.execute(
                 'SELECT state FROM jobs WHERE jobs.id = ?',
                 (job_id,)
-            ).fetchone()
-        
+        ).fetchone()
         if state is None:
             abort(404)
-            
         state = state['state']
-        
         return jsonify({"state": get_public_state(state),
                         "completion": round(state/MAX_STATE)})
 
     @app.route('/<string:job_id>/address', methods=('GET',))
     def get_address(job_id):
         db = get_db()
-
-        address = None
-        
-        with db.cursor() as cur:
-            address = cur.execute(
+        address = db.execute(
                 'SELECT address FROM ensicoin WHERE id = ?',
                 (job_id,)
-            ).fetchone()
+        ).fetchone()
 
         if address is None:
             abort(404)
-        
         address = address['address']
-        
         return jsonify({"address": address})
 
     @app.route('/<string:job_id>/result', methods=('GET',))
     def get_result(job_id):
         db = get_db()
-
-        result = None
-
-        with db.cursor() as cur:
-            result = cur.execute(
+        result = db.execute(
                 'SELECT segments FROM result WHERE id = ?',
                 (job_id,)
-            ).fetchone()
+        ).fetchone()
 
         if result is None:
             abort(404)
-        
         result = result['segments']
-        
         return jsonify({"result": result})
 
     @app.route('/', methods=('POST',))
     def new_job():
         db = get_db()
         job_id = ''.join(random.choices(string.ascii_letters, k=20))
-        
-        def op(cur):
-            cur.execute(
-                'INSERT INTO jobs (id, state)'
-                ' VALUES (?, ?)',
-                (job_id, 0)
-            )
-
-        run_transaction(db, op)
-        
+        db.execute(
+            'INSERT INTO jobs (id, state)'
+            ' VALUES (?, ?)',
+            (job_id, 0)
+        )
+        db.commit()
         t = threading.Thread(target=init.generate_segments,
                              args=(job_id, A_PI_ADDRESS))
         t.start()
-        
         return jsonify({"id": job_id})
 
     return app
