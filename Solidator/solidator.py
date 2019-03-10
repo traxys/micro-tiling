@@ -58,6 +58,7 @@ def open_process(point):
 
 def remove_deg_1(points, multithread = True):
     if multithread:
+        # cleanup what might have been left from before
         system('rm msg_*')
         mkfifo('msg_main')
         number_deg1 = 0
