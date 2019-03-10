@@ -104,7 +104,7 @@ def action(db, job_id, job_current):
     db.execute(
         'INSERT INTO segment (job_id, x1, y1, x2, y2)'
         ' VALUES (?, ?, ?, ?, ?)',
-        (job_id,) + segment_generator.random_segment(1, 1)
+        (job_id,) + segment_generator.random_segment(2, 2)
     )
     db.commit()
 
