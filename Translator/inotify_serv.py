@@ -79,4 +79,6 @@ def listen(watch_dir):
     wm.add_watch(watch_dir, mask)
     notifier.loop()
 
-listen(WATCH_DIR)
+
+if __name__ == "__main__":
+    listen(WATCH_DIR)
