@@ -1,5 +1,7 @@
 # Micro-Tiling
 
+[![Documentation Status](https://readthedocs.org/projects/micro-tiling/badge/?version=latest)](https://micro-tiling.readthedocs.io/en/latest/?badge=latest)
+
 An API capable of generating mosaics, based on micro services.
 
 ![Alt text](./protocol.svg)
