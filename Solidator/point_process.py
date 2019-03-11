@@ -3,6 +3,22 @@
 processes are sent the IDs of their neighbours at start
 once they have them, they start telling others if they have a degree of 1
 and they listen for neighbours signaling they have a degree of 1
+
+
+signification of messages to point_processes :
+    e : message comming from main meaning it is now time to write
+        the result.
+
+    d <neighbour_id> : the neighbouring point with neighbour_id
+        had only one neighbour left 'alive' and is therefore
+        now 'dead'.
+
+    A <neighbour_id> <neighbour_x_pos> <neighbour_y_pos> : the
+        corresponding neighbour is still 'alive' (sent after the neighbour
+        received a message 'e').
+
+    D : a neighbour is 'dead' and no line should be displayed between the
+        two points.
 '''
 import sys
 
@@ -12,7 +28,7 @@ line_blueprint = '<line x1="{}" y1="{}" x2="{}" y2="{}"\
 
 
 def debug(string, own_id):
-    '''write a *string*  in stderr and add the point *own_id* for clarity
+    '''write a *string*  in stderr and add the point's *own_id* for clarity
     '''
     sys.stderr.write('(' +
                      str(own_id) +
@@ -33,18 +49,16 @@ def read_neighbours(amount):
     neighbours_pid = []
     while len(neighbours_pid) < amount:
         neighbours_pid.append(int(sys.stdin.readline()))
-    debug('found all neighbours\n')
     return neighbours_pid
 
 
 def signal_death(neighbour_messager, own_id):
     """Tells all neighbours of *own_id* death by *neighbour_messager*
     """
-    # share death
     for fifo in neighbour_messager:
         fifo.write('d '+str(own_id)+'\n')
         fifo.flush()
-    debug('I DIED !!!\n')
+    debug('I DIED !!!\n', own_id)
 
 
 def who_am_i_at_the_end(is_dead, neighbour_messenger, own_id, position):
@@ -59,7 +73,7 @@ def who_am_i_at_the_end(is_dead, neighbour_messenger, own_id, position):
             msg.close()
     else:
         for msg in neighbour_messenger:
-            msg.write('a ' +
+            msg.write('A ' +
                       str(own_id) +
                       ' ' +
                       ' '.join(str(c) for c in position) +
@@ -86,7 +100,6 @@ def svg_output(message, own_id, position, res):
                                         svg_coord(float(message.split()[2])),
                                         svg_coord(float(message.split()[3]))))
         res.flush()
-        debug('writing line from '+str(own_id)+' to '+str(point_id)+'\n')
 
 
 def main():
@@ -99,7 +112,7 @@ def main():
     write_main = open('msg_main', 'w')
     messages = open('msg_' + str(own_id), 'r')
 
-    debug('process starting\n')
+    debug('process starting\n', own_id)
 
     neighbours_pid = []
 
@@ -133,25 +146,25 @@ def main():
             res = open('result.svg', 'a')
             who_am_i_at_the_end(dead, write_neighbours, own_id, position)
 
-        elif m[0] == 'D':
-            dead_processes += 1
-
         elif m[0] == 'd':
             if not dead:
-                debug("one of my neighbours died !\n")
+                debug("one of my neighbours died !\n", own_id)
                 n_of_live_neighbours -= 1
                 if n_of_live_neighbours == 0 or n_of_live_neighbours >= 2:
                     write_main.write('d')
                     write_main.flush()
 
-        elif m[0] == 'a':
+        elif m[0] == 'D':
+            dead_processes += 1
+
+        elif m[0] == 'A':
             dead_processes += 1
             if not dead:
                 svg_output(m, own_id, position, res)
 
     res.close()
 
-    debug("And now I am dead.\n")
+    debug("And now I am dead.\n", own_id)
     write_main.write('e')
     write_main.flush()
     write_main.close()

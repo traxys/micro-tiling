@@ -1,4 +1,10 @@
 #! /usr/bin/python3
+'''
+signification of messages to solidator :
+    r : the point is ready.
+    d : there is one less point of degree 1 alive.
+    e : a point process has ended.
+'''
 from math import sqrt
 import subprocess
 from os.path import abspath
@@ -121,6 +127,7 @@ def remove_deg_1(points, multiprocess=True):
             m = messages.read(1)
             if m == 'r':
                 unprepared_processes -= 1
+            sleep(0.1)
 
         # tell each process the position of the point they represent
         # and the id of their neighbours
@@ -137,10 +144,10 @@ def remove_deg_1(points, multiprocess=True):
         # (associated processes are still running,
         # they just know they shouldn't be displayed on the result)
         while number_deg1:
-            print('deg1 left :', number_deg1)
             m = messages.read(1)
             if m == 'd':
                 number_deg1 -= 1
+            print('deg1 left :', number_deg1)
             sleep(0.1)
     
         # write svg header
@@ -170,6 +177,9 @@ def remove_deg_1(points, multiprocess=True):
         res.write('</svg>\n')
         res.flush()
         res.close()
+
+        # cleanup all fifos
+        system('rm msg_*')
 
     else:
         deg1 = [p for p in points if len(p.linked)==1]
