@@ -102,13 +102,13 @@ def action(db, job_id, job_current):
     """
 
     db.execute(
-        'UPDATE job SET digits = ?'
-        ' WHERE id = ?',
+        'UPDATE job SET digits = %s'
+        ' WHERE id = %s',
         (job_current + 1, job_id)
     )
     db.execute(
         'INSERT INTO segment (job_id, x1, y1, x2, y2)'
-        ' VALUES (?, ?, ?, ?, ?)',
+        ' VALUES (%s, %s, %s, %s, %s)',
         (job_id,) + segment_generator.random_segment(2, 2)
     )
     db.commit()
@@ -121,7 +121,7 @@ def terminate(db, job_id, mill_stub):
 
     segments = db.execute(
         'SELECT x1, y1, x2, y2 FROM segment'
-        ' WHERE job_id = ?',
+        ' WHERE job_id = %s',
         (job_id,)
     ).fetchall()
 
@@ -143,12 +143,12 @@ def terminate(db, job_id, mill_stub):
 
     db.execute(
         'DELETE FROM job'
-        ' WHERE id = ?',
+        ' WHERE id = %s',
         (job_id,)
     )
     db.execute(
         'DELETE FROM segment'
-        ' WHERE job_id = ?',
+        ' WHERE job_id = %s',
         (job_id,)
     )
     db.commit()
@@ -196,7 +196,7 @@ def create_app(test_config=None):
 
             db = get_db()
             job_current = db.execute(
-                'SELECT job.digits FROM job WHERE job.id = ?',
+                'SELECT job.digits FROM job WHERE job.id = %s',
                 (job,)
             ).fetchone()
 
@@ -208,7 +208,7 @@ def create_app(test_config=None):
                 if digit == '3':
                     db.execute(
                         'INSERT INTO job (id, digits)'
-                        ' VALUES (?, ?)',
+                        ' VALUES (%s, %s)',
                         (job, 1)
                     )
                     db.commit()
