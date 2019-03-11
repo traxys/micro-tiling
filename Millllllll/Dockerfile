@@ -1,8 +1,10 @@
 FROM jfloff/alpine-python:latest
 
+RUN apk update
+RUN apk add py-psycopg2
 RUN pip3 install grpcio
 RUN pip3 install protobuf
-RUN pip3 install psycopg2
+RUN pip3 install python-etcd
 
 WORKDIR olala
 COPY . .
