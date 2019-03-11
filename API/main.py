@@ -30,6 +30,10 @@ def get_public_state(state):
         return "clipping segments"
     elif state <= 19:
         return "translating segments"
+    elif state <= 22:
+        return "cutting segments"
+    elif state == 23:
+        return "waiting fees"
 
 
 def init_db():

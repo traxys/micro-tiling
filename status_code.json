@@ -18,5 +18,9 @@
   16: "translator_translated",
   17: "translator_kanji_encoded",
   18: "translator_encrypted",
-  19: "translator_sent_mail"
+  19: "translator_sent_mail",
+  20: "cruxingator_recieved_mail",
+  21: "cruxingator_cutting",
+  22: "cruxingator_cut_segments",
+  23: "cruxingator_waiting_fees"
 }
