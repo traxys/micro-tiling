@@ -15,7 +15,7 @@ def listen():
 
     while True:
         conn, _ = listener.accept()
-        data = conn.recv().decode()
+        data = conn.recv(66).decode()
 
         _, flags = ensicoin.wait_for_pubkey(data)
 
