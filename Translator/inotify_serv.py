@@ -7,7 +7,7 @@ import translator
 import database
 
 WATCH_DIR = 'jobs'
-SMTP_HOST = 'localhost'
+SMTP_HOST = 'localhost:8025'
 
 
 def translation(segments, job_id, gpg):
@@ -31,7 +31,7 @@ def encode(string):
 def encrypt(string, gpg):
     """ Encrypt the *string* in pgp encoded using the context *gpg*
     """
-    enc = gpg.encrypt(string.encode(), gpg.list_keys()[0]['fingerprint'])
+    enc = gpg.encrypt(string, gpg.list_keys()[0]['fingerprint'])
     return str(enc)
 
 
@@ -43,13 +43,9 @@ def send(host, segments, job_id, gpg):
 
     sender = "translator@micro-tiling.tk"
     receivers = ["cruxingator@micro-tiling.tk"]
-    message = """From: {}
-    To: {}
-    Subject: {}
+    message = """{}|""".format(job_id)
 
-    """.format(sender, receivers[0], job_id)
-
-    message += encode(json.dumps(segments)) + "\n"
+    message += json.dumps(segments) + "\n"
     database.update_state(database.open_db(), 17, job_id)
 
     message = encrypt(message, gpg)
@@ -81,7 +77,6 @@ def listen(watch_dir):
             segment_file = open(event.pathname, "r")
             segments = json.loads(segment_file.read())
             segment_file.close()
-
 
             translation(segments, event.name, gpg)
             os.remove(event.pathname)
