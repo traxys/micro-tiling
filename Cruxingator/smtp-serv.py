@@ -4,6 +4,8 @@ import time
 import json
 import gnupg
 import split
+import database
+
 
 def decode(string):
     f = open("kanji")
@@ -44,12 +46,15 @@ class Handler:
         message = decrypt(message)
 
         job_id = message.split("|")[0]
+        database.update_state(database.open_db(), 20, job_id)
         segments = message.split("|")[1].strip()
         new_segments = []
         for (x1, y1), (x2, y2) in segments:
             new_segments.append(split.Segment(split.Vect(x1, y1),
                                               split.Vect(x2, y2)))
+        database.update_state(database.open_db(), 21, job_id)
         cut_segments = split.cut(new_segments)
+        database.update_state(database.open_db(), 22, job_id)
 
         return '250 Message accepted for delivery'
 
