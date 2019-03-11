@@ -133,13 +133,9 @@ def terminate(db, job_id, mill_stub):
                         x=s['x2'],
                         y=s['y2'])) for s in segments]
 
-    t = threading.Thread(target=mill_stub.Turn,
-                         args=(mill_pb2.Job(
-                                id=job_id,
-                                segments=segments,
-                            ), ))
+    mill_stub.Turn(mill_pb2.Job(id=job_id,
+                                segments=segments))
     database.update_state(database.open_db(), 3, job_id)
-    t.start()
 
     db.execute(
         'DELETE FROM job'

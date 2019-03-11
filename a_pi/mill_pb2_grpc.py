@@ -14,7 +14,7 @@ class MillStub(object):
     Args:
       channel: A grpc.Channel.
     """
-    self.Turn = channel.unary_unary(
+    self.Turn = channel.unary_stream(
         '/Mill/Turn',
         request_serializer=mill__pb2.Job.SerializeToString,
         response_deserializer=mill__pb2.Response.FromString,
@@ -35,7 +35,7 @@ class MillServicer(object):
 
 def add_MillServicer_to_server(servicer, server):
   rpc_method_handlers = {
-      'Turn': grpc.unary_unary_rpc_method_handler(
+      'Turn': grpc.unary_stream_rpc_method_handler(
           servicer.Turn,
           request_deserializer=mill__pb2.Job.FromString,
           response_serializer=mill__pb2.Response.SerializeToString,
