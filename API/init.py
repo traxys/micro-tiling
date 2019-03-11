@@ -26,13 +26,20 @@ MIN_SEGMENT = 5
 def generate_segments(job_id, address):
     """Generate segments for *job_id* using a_pi at host at *address*
     """
+
+    print('OLALA', address)
+
     pi = make_pi(random.randint(MIN_SEGMENT, MAX_SEGMENT))
-    database.update_state(database.open_db(), 1, job_id)
+    database.update_state(1, job_id)
+
+    print('pi', pi)
 
     for digit in pi:
         payload = {'digit': str(digit), 'job': job_id}
-        _ = requests.post(address, data=payload)
+        print('héhéhéhéhhéhé', requests.post(address, data=payload))
 
     done = {'digit': 'π', 'job': job_id}
-    _ = requests.post(address, data=done)
+    print('huhuhhuhuhuhuh', requests.post(address, data=done))
+
+
     return job_id

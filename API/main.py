@@ -15,7 +15,7 @@ from flask import jsonify
 import threading
 
 MAX_STATE = 42
-A_PI_ADDRESS = os.environ['A_PI_ADDRESS'] or 'http://localhost:5000'
+A_PI_ADDRESS = os.environ['A_PI_ADDRESS']
 
 
 def get_public_state(state):
@@ -92,8 +92,6 @@ def create_app(test_config=None):
 
     @app.route('/<string:job_id>/result', methods=('GET',))
     def get_result(job_id):
-        db = get_db()
-
         result = None
 
         try:
@@ -105,7 +103,6 @@ def create_app(test_config=None):
 
     @app.route('/', methods=('POST',))
     def new_job():
-        db = get_db()
         job_id = ''.join(random.choices(string.ascii_letters, k=20))
 
         db.write("/{}/state".format(job_id), 0)
@@ -117,3 +114,4 @@ def create_app(test_config=None):
     return app
 
 app = create_app()
+
