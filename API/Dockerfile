@@ -1,13 +1,23 @@
-FROM alpine:latest
+FROM golang:latest as build-env
 
-RUN apk add python3 py3-pip build-base python3-dev
-RUN pip3 install uvicorn quart python-etcd requests
+RUN mkdir /app
+WORKDIR /app
+
+COPY go.mod .
+COPY go.sum .
+
+RUN go mod download
+
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /go/bin/app
+
+FROM scratch
+
+COPY --from=build-env /go/bin/app /go/bin/app
+COPY --from=build-env /app /app
 
 WORKDIR /app
-COPY . .
 
-EXPOSE 8000
+EXPOSE 8080
 
-RUN chmod +x run.sh
-
-CMD [ "./run.sh" ]
+ENTRYPOINT [ "/go/bin/app" ]
