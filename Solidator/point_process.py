@@ -52,27 +52,27 @@ def read_neighbours(amount):
     return neighbours_pid
 
 
-def signal_death(neighbour_messager, own_id):
-    """Tells all neighbours of *own_id* death by *neighbour_messager*
+def signal_death(neighbour_messagers, own_id):
+    """Tells all neighbours of *own_id* death by *neighbour_messagers*' fifo files
     """
-    for fifo in neighbour_messager:
+    for fifo in neighbour_messagers:
         fifo.write('d '+str(own_id)+'\n')
         fifo.flush()
     debug('I DIED !!!\n', own_id)
 
 
-def who_am_i_at_the_end(is_dead, neighbour_messenger, own_id, position):
-    """Tells all neighbours by *neighbour_messenger*
+def who_am_i_at_the_end(is_dead, neighbour_messagers, own_id, position):
+    """Tells all neighbours by *neighbour_messagers*
     the vertex *own_id* and *position* if not *is_dead*,
     else send them D
     """
     if is_dead:
-        for msg in neighbour_messenger:
+        for msg in neighbour_messager:
             msg.write('D\n')
             msg.flush()
             msg.close()
     else:
-        for msg in neighbour_messenger:
+        for msg in neighbour_messager:
             msg.write('A ' +
                       str(own_id) +
                       ' ' +
@@ -91,7 +91,7 @@ def svg_coord(x):
 def svg_output(message, own_id, position, res):
     """Outputs to *res* the svg line from *position* to the neighbour
     indicated in *message* if *own_id* is smaller than
-    the neighbour's id
+    the neighbour's id (this is to avoid writing twice the same line)
     """
     point_id = int(message.split()[1])
     if point_id > int(own_id):

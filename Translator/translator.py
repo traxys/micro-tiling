@@ -5,7 +5,7 @@ import bf_interpreter
 
 
 def encode(vect):
-    """Takes a **point** *vect* and converts it to six bytes
+    """Takes a *vect* and converts it to six bytes
     """
     s = struct.pack('>i', int(vect[0] * 256 * 256 * 256))[:-1]
     s += struct.pack('>i', int(vect[1] * 256 * 256 * 256))[:-1]
@@ -13,7 +13,7 @@ def encode(vect):
 
 
 def decode(s):
-    """Takes six bytes *s* and returns a **point**
+    """Takes six bytes *s* and returns a **point** (tuple of coordinates)
     """
     x = struct.unpack('>i', s[:3]+b'\x00')[0]/256./256/256
     y = struct.unpack('>i', s[3:6]+b'\x00')[0]/256./256/256
@@ -27,7 +27,8 @@ def decode_nine(s):
 
 
 def go_through_brainfuck(file_name, point, use_python=False):
-    """ passes *points* throught the brainfuck file *file_name*
+    """Passes *point* through the brainfuck file *file_name*
+    Returns a list of translated points
     """
     encoded = encode(point)
     if use_python:
@@ -46,7 +47,8 @@ def go_through_brainfuck(file_name, point, use_python=False):
 
 
 def translate_segments(segments, use_python=False):
-    """Translate and copies each *segments* in all eight direction
+    """Translate and copies each segment from the list *segments* in all
+    eight directions
     """
     out = []
     for s in segments:

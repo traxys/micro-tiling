@@ -40,7 +40,7 @@ lines = [segment(p(0, 0.4), p(1.5, 1.5))]
 
 
 def clip_right(lines):
-    """Clip *lines* with a vertical line to the right
+    """Clip *lines* with a vertical line to the right at x = 1
     """
     out = []
     for l in lines:
