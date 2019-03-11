@@ -4,10 +4,12 @@ import time
 
 
 class Interpret:
-    """Interpret a brainfuck code,
-    Loads *file_name* in a memory of size *mem_size*, loads the inputs with *get_input*
+    """Executes a brainfuck code,
     """
     def __init__(self, file_name, mem_size = 65536, get_input = lambda: sys.stdin.read(1)):
+        '''Loads *file_name* and initializes an empty memory of size *mem_size*
+        The function *get_input* will be used to read input characters one by one
+        '''
         f = open(file_name, "r")
         self.code = [c for c in f.read() if c in '[]+-<>,.']
         self.pos = 0
@@ -60,7 +62,8 @@ class Interpret:
         self.next_char()
 
     def get_output(self, size = 0):
-        """If *size* is 0 gets the current output, else waits for the output size to be *size*
+        """If *size* is 0 gets the current output, else execute the code until
+        the output size is *size*
         """
         if size <= 0:
             out = self.out

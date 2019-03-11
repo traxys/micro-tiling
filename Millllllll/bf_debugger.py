@@ -96,6 +96,9 @@ class Interpret:
         self.input += string
 
 def interactive_mode(stdscr, code_name, input_name, mem_size, delay, mem_colors = []):
+    '''Displays the brainfuck code and the memory with curses
+    and enables the user to interract with the code.
+    '''
     curses.curs_set(0)
 
     curses.init_pair(1, curses.COLOR_RED, 0)

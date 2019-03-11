@@ -17,7 +17,7 @@ TCP_IP = '127.0.0.1'
 
 
 def recv_data(conn):
-    """Recv all data from a socket *conn*
+    """Receive all data from a socket *conn*
     """
     data = ""
     while True:
@@ -29,7 +29,7 @@ def recv_data(conn):
 
 
 def send(data, host, port):
-    """Send *data* using a gopher connnection on *host*:*port*
+    """Sends *data* using a gopher connnection on *host*:*port*
     """
     gopher_conn = socket.create_connection((host, port))
     gopher_conn.send(data)
@@ -56,7 +56,7 @@ def unit(segments, job_id):
 
 
 def write(job_id, text):
-    """Writes a *text* by a html form
+    """Writes a *text* by an html form
     """
     database.update_state(database.open_db(), 11, job_id)
     display = Display(visible=0, size=(1024, 768))
