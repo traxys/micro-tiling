@@ -1,4 +1,21 @@
 #! /usr/bin/python3
+'''you can see how rotate.bf works by using the following commands :
+echo -e '\x01\x02\x03\x04\x05\x06' > test_input
+./bf_debugger.py rotate.bf test_input "r r r g g b m y y r r r m y y y y r r r m y y y y r r r m y y y y"
+
+(you can also play around with the input values in the first command)
+in the above command, 3 byte variables are shown in red,
+the 1s and 0s used for carry checks are in magenta and yellow
+the bytes where are put every small multiplication inputs are in green
+and the byte for small multiplication outputs are in blue
+
+to use the debugger :
+    - you can use the down arrow key to execute the code until the executer
+     arrives on a line below.
+    - you can use [ to go to the next loop start
+    - you can use ] to go exit the loop the code currently is in
+    - you can press any other key to execute one character
+'''
 import curses
 import sys
 import time
@@ -168,13 +185,13 @@ def interactive_mode(stdscr, code_name, input_name, mem_size, delay, mem_colors 
         last_head_pos = program.head_pos
         time.sleep(delay)
         k = stdscr.getkey()
-        if k == "u":
+        if k == "[":
             try:
                 program.next_loop_start()
             except EOFError:
                 return
             redraw_mem()
-        elif k == "h":
+        elif k == "]":
             program.exit_loop()
             redraw_mem()
         elif k == "KEY_DOWN":
