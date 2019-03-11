@@ -5,8 +5,6 @@ import etcd
 DATABASE_HOST = os.environ["DATABASE_HOST"]
 DATABASE_PORT = os.environ["DATABASE_PORT"]
 
-    return conn
-
 def open_db():
     """Opens the database
     """
