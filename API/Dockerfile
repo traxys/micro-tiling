@@ -1,5 +1,13 @@
-FROM tiangolo/uwsgi-nginx-flask:latest
+FROM alpine:latest
 
-RUN pip install requests python-etcd
+RUN apk add python3 py3-pip build-base python3-dev
+RUN pip3 install uvicorn quart python-etcd requests
 
-COPY . /app
+WORKDIR /app
+COPY . .
+
+EXPOSE 8000
+
+RUN chmod +x run.sh
+
+CMD [ "./run.sh" ]
