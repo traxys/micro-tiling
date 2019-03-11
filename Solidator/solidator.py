@@ -72,7 +72,7 @@ class Point:
         self.linked += other.linked
 
     def get_pos(self, precision=1e-10):
-        """Returns an position up to *precision*
+        """Returns a position rounded up to *precision*
         """
         return (int(self.pos.x/precision)*precision,
                 int(self.pos.y/precision)*precision)
@@ -80,10 +80,22 @@ class Point:
     def __repr__(self):
         return 'Point('+str(self.pos.x)+', '+str(self.pos.y)+')'
 
+def create_points(point_list):
+    '''Takes in a list of [(point_id, pos_x, pos_y, [list of neighbours' ids]),...]
+    and output a list of **Point**
+    '''
+    points = {p[0]:Point(p[1], p[2]) for p in point_list}
+    for p in point_list:
+        start_id = p[0]
+        for neighbour_id in p[3]:
+            neighbour = points[neighbour_id]
+            points[start_id].linked.append(neighbour)
+    return [points[p_id] for p_id in points]
+
 
 def open_process(point):
-    '''opens a process representing a *point*
-    tells it how many neighbours it should expect and its *point* *id*
+    '''Opens a process representing a *point*
+    tells it how many neighbours it should expect and its *Point* *id*
     '''
     proc = subprocess.Popen([abspath('./point_process.py'),
                              str(len(point.linked)),
@@ -95,7 +107,7 @@ def open_process(point):
 
 
 def remove_deg_1(points, multiprocess=True):
-    '''write an svg with only closed polygons displayed
+    '''Write an svg with only closed polygons displayed
     '''
     if multiprocess:
         # cleanup what might have been left from before
