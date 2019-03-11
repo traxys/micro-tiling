@@ -1,7 +1,7 @@
 FROM alpine:latest
 
 RUN apk add python3 py3-pip gnupg py-numpy
-RUN pip3 install aiosmtpd python-gnupg
+RUN pip3 install aiosmtpd python-gnupg psycopg2
 
 COPY . .
 
