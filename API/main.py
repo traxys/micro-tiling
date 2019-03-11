@@ -14,7 +14,7 @@ from flask import jsonify
 import threading
 
 MAX_STATE = 42
-A_PI_ADDRESS = os.environ['A_PI_ADDRESS'] or 'http://localhost:5000'
+A_PI_ADDRESS = os.environ['A_PI_ADDRESS']
 
 
 def get_public_state(state):
@@ -37,12 +37,8 @@ def get_public_state(state):
 
 
 def init_db():
-    db = get_db()
-
     with current_app.open_resource('schema.sql') as f:
-        database.run_transaction(db,
-                                 lambda conn: conn.cursor().
-                                 execute(f.read().decode('utf8')))
+        database.run_transaction(lambda conn: conn.cursor().execute(f.read().decode('utf8')))
 
 
 @click.command('init-db')
@@ -52,22 +48,7 @@ def init_db_command():
     init_db()
     click.echo('Initialized the database.')
 
-
-def get_db():
-    if 'db' not in g:
-        g.db = database.open_db()
-    return g.db
-
-
-def close_db(e=None):
-    db = g.pop('db', None)
-
-    if db is not None:
-        db.close()
-
-
 def init_app(app):
-    app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
 
 
@@ -102,31 +83,31 @@ def create_app(test_config=None):
 
     @app.route('/<string:job_id>/state', methods=('GET',))
     def get_state(job_id):
-        db = get_db()
-
         state = None
 
-        with db.cursor() as cur:
-            state = cur.execute(
+        with database.open_db().cursor() as cur:
+            cur.execute(
                 'SELECT state FROM jobs WHERE jobs.id = %s',
                 (job_id,)
-            ).fetchone()
+            )
+
+            state = cur.fetchone()
+
+            print(state)
 
         if state is None:
-            abort(404)
+            abort(418)
 
-        state = state['state']
+        state = state[0]
 
         return jsonify({"state": get_public_state(state),
                         "completion": round(state/MAX_STATE)})
 
     @app.route('/<string:job_id>/address', methods=('GET',))
     def get_address(job_id):
-        db = get_db()
-
         address = None
 
-        with db.cursor() as cur:
+        with database.open_db().cursor() as cur:
             address = cur.execute(
                 'SELECT address FROM ensicoin WHERE id = %s',
                 (job_id,)
@@ -141,11 +122,9 @@ def create_app(test_config=None):
 
     @app.route('/<string:job_id>/result', methods=('GET',))
     def get_result(job_id):
-        db = get_db()
-
         result = None
 
-        with db.cursor() as cur:
+        with database.open_db().cursor() as cur:
             result = cur.execute(
                 'SELECT segments FROM result WHERE id = %s',
                 (job_id,)
@@ -160,7 +139,6 @@ def create_app(test_config=None):
 
     @app.route('/', methods=('POST',))
     def new_job():
-        db = get_db()
         job_id = ''.join(random.choices(string.ascii_letters, k=20))
 
         def op(conn):
@@ -171,14 +149,13 @@ def create_app(test_config=None):
                     (job_id, 0)
                 )
 
-        database.run_transaction(db, op)
+        database.run_transaction(op)
 
-        t = threading.Thread(target=init.generate_segments,
-                             args=(job_id, A_PI_ADDRESS))
-        t.start()
+        init.generate_segments(job_id, A_PI_ADDRESS)
 
         return jsonify({"id": job_id})
 
     return app
 
 app = create_app()
+
