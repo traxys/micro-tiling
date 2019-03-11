@@ -14,9 +14,20 @@ def launch_job(host):
     return json.loads(r.text)["id"]
 
 
-def manage_state(host, ensicoin_adress, result):
+def get_address(host, job_id):
+    """Gets the ensicoin address needing fees for *job*
+    """
+    r = requests.get(host +
+                     job_id +
+                     "/address")
+    if r.ok:
+        return json.loads(r.text)["address"]
+    else:
+        return None
+
+
+def manage_state(host, result):
     """Iterator on the completion of a job generation at *host*,
-    using the *ensicoin_adress* as needed.
 
     Writes the mosaic in the list *result*
     """
@@ -31,34 +42,35 @@ def manage_state(host, ensicoin_adress, result):
         if state["state"] == "error":
             job_id = launch_job(host)
             continue
-        yield state["completion"]
+        yield (state["completion"], state["state"], job_id)
         time.sleep(10)
 
 
-def generate_mosaic(host, ensicoin_address):
-    """Wraps **manage_state** to return a result
+def generate_mosaic(host, on_invoice):
+    """Wraps **manage_state** to return a result, uses *on_invoice* when
+    needing to pay
     """
     result = []
-    for _ in manage_state(host, ensicoin_address, result):
-        pass
+    for _, state, job_id in manage_state(host, result):
+        address = get_address(host, job_id)
+        if address is not None:
+            on_invoice(address)
     return result[0]
 
 
 if __name__ == "__main__":
     import progressbar
 
-    def wrap_bar(host, ensicoin_address):
+    def wrap_bar(host):
+        priv_key = input("Ensicoin private key to pay fees :")
         bar = progressbar.ProgressBar(max_value=100,
                                       widgets=["generating mosaic : ",
                                                progressbar.Bar(),
                                                progressbar.Timer()])
         bar.start()
         result = []
-        for completion in manage_state(
-                            host,
-                            ensicoin_address,
-                            result):
+        for completion, state, _ in manage_state(host, result):
             bar.update(completion)
 
     import sys
-    wrap_bar(sys.argv[1], sys.argv[2])
+    wrap_bar(sys.argv[1])
