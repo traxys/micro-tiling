@@ -1,23 +1,10 @@
-FROM golang:latest AS build-env
+FROM alpine:latest
 
-WORKDIR /src
+RUN apk add python3 py3-pip gnupg py-numpy
+RUN pip3 install aiosmtpd python-gnupg
 
-COPY maildiranasaurus .
+COPY . .
 
-RUN go get github.com/flashmob/maildiranasaurus/cmd/maildiranasaurus
-RUN make dependencies
-RUN make maildiranasaurus
+EXPOSE 8025
 
-FROM alpine
-
-WORKDIR /app
-
-RUN apk add file
-COPY --from=build-env /src/maildiranasaurus .
-COPY cruxingator .
-
-RUN mkdir /mail
-
-EXPOSE 25
-
-CMD [ "./init.sh" ]
+CMD [ "python3", "smtp-serv.py" ]
