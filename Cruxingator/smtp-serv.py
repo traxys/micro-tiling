@@ -5,12 +5,13 @@ import json
 import gnupg
 import split
 import database
+import ensicoin
+import os
+import socket
 
 
-def decode(string):
-    f = open("kanji")
-    kanji = json.loads(f.read())
-    return ''.join(map(lambda k: ord(kanji.index(k)), string))
+SOLIDATOR_ADDRESS = os.environ["SOLIDATOR_ADDRESS"]
+SOLIDATOR_PORT = os.environ["SOLIDATOR_PORT"]
 
 
 def decrypt(string):
@@ -55,6 +56,23 @@ class Handler:
         database.update_state(database.open_db(), 21, job_id)
         cut_segments = split.cut(new_segments)
         database.update_state(database.open_db(), 22, job_id)
+
+        pk1, sk1 = ensicoin.generate_keys()
+        database.open_db().write("/{}/address", sk1)
+        pk2, sk2 = ensicoin.generate_keys()
+
+        solidator_socket = socket.create_connection((SOLIDATOR_ADDRESS,
+                                                     SOLIDATOR_PORT))
+        solidator_socket.send(pk2.encode())
+        hashtx, _ = ensicoin.wait_for_pubkey(pk1)
+        ensicoin.send_to(10,
+                         hashtx,
+                         0,
+                         sk1,
+                         1,
+                         pk2,
+                         [job_id,
+                          json.dumps(cut_segments)])
 
         return '250 Message accepted for delivery'
 

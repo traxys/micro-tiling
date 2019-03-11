@@ -13,10 +13,10 @@ def generate_keys():
 
 def wait_for_pubkey(pubKey):
     output = subprocess.check_output(['ensicoincoin-cli', 'waitforpubkey', '--pubkey', pubKey])
-    flags = output.decode('ASCII').split('\n')[1:]
-    flags = flags[:len(flags) - 1]
+    lines = output.decode('ASCII').split('\n')
+    flags = lines[1:len(lines) - 1]
 
-    return flags
+    return (lines[0], flags)
 
 
 def wait_for_flag(flag):
