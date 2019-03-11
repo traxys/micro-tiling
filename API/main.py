@@ -80,6 +80,9 @@ def create_app(test_config=None):
 
     init_app(app)
 
+    with app.app_context():
+        init_db()
+
     if test_config is None:
         # load the instance config, if it exists, when not testing
         app.config.from_pyfile('config.py', silent=True)
@@ -105,7 +108,7 @@ def create_app(test_config=None):
 
         with db.cursor() as cur:
             state = cur.execute(
-                'SELECT state FROM jobs WHERE jobs.id = ?',
+                'SELECT state FROM jobs WHERE jobs.id = %s',
                 (job_id,)
             ).fetchone()
 
@@ -125,7 +128,7 @@ def create_app(test_config=None):
 
         with db.cursor() as cur:
             address = cur.execute(
-                'SELECT address FROM ensicoin WHERE id = ?',
+                'SELECT address FROM ensicoin WHERE id = %s',
                 (job_id,)
             ).fetchone()
 
@@ -144,7 +147,7 @@ def create_app(test_config=None):
 
         with db.cursor() as cur:
             result = cur.execute(
-                'SELECT segments FROM result WHERE id = ?',
+                'SELECT segments FROM result WHERE id = %s',
                 (job_id,)
             ).fetchone()
 
@@ -160,12 +163,13 @@ def create_app(test_config=None):
         db = get_db()
         job_id = ''.join(random.choices(string.ascii_letters, k=20))
 
-        def op(cur):
-            cur.execute(
-                'INSERT INTO jobs (id, state)'
-                ' VALUES (?, ?)',
-                (job_id, 0)
-            )
+        def op(conn):
+            with conn.cursor() as cur:
+                cur.execute(
+                    'INSERT INTO jobs (id, state)'
+                    ' VALUES (%s, %s)',
+                    (job_id, 0)
+                )
 
         database.run_transaction(db, op)
 

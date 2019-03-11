@@ -4,7 +4,7 @@ from math import sqrt
 # TODO : REMOVE numpy dependencies (used for matrix inversions)
 from numpy import array
 from numpy.linalg import inv
-
+import os
 
 class Vect:
     """Two dimensional Vector"""
