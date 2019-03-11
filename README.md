@@ -76,11 +76,11 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Authors
 
-* **Aurélien Moisson-franckhauser** - *Initial work* []()
+* **Aurélien Moisson-franckhauser** - *Initial work* [aurelienMoisson](https://github.com/aurelienMoisson)
 * **Johyn Papin** - *Initial work* - [johynpapin](https://github.com/johynpapin)
 * **Quentin Boyer** - *Initial work* - [traxys](https://github.com/traxys)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/traxys/micro-tiling/contributors) who participated in this project.
 
 ## License
 
