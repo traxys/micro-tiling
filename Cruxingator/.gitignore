@@ -1,1 +1,5 @@
 build
+private-keys-v1.d
+pubring.kbx
+pubring.kbx~
+trustdb.gpg
