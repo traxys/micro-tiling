@@ -4,6 +4,7 @@ import string
 import random
 from flask import Flask
 import init
+import etcd
 
 import click
 from flask import current_app, g
@@ -36,39 +37,10 @@ def get_public_state(state):
         return "waiting fees"
 
 
-def init_db():
-    db = get_db()
-
-    with current_app.open_resource('schema.sql') as f:
-        database.run_transaction(db,
-                                 lambda conn: conn.cursor().
-                                 execute(f.read().decode('utf8')))
-
-
-@click.command('init-db')
-@with_appcontext
-def init_db_command():
-    """Clear the existing data and create new tables."""
-    init_db()
-    click.echo('Initialized the database.')
-
-
 def get_db():
     if 'db' not in g:
         g.db = database.open_db()
     return g.db
-
-
-def close_db(e=None):
-    db = g.pop('db', None)
-
-    if db is not None:
-        db.close()
-
-
-def init_app(app):
-    app.teardown_appcontext(close_db)
-    app.cli.add_command(init_db_command)
 
 
 def create_app(test_config=None):
@@ -77,11 +49,6 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY='dev'
     )
-
-    init_app(app)
-
-    with app.app_context():
-        init_db()
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
@@ -104,18 +71,10 @@ def create_app(test_config=None):
     def get_state(job_id):
         db = get_db()
 
-        state = None
-
-        with db.cursor() as cur:
-            state = cur.execute(
-                'SELECT state FROM jobs WHERE jobs.id = %s',
-                (job_id,)
-            ).fetchone()
-
-        if state is None:
+        try:
+            state = db.read("/{}/state".format(job_id))
+        except etcd.EtcdKeyNotFound:
             abort(404)
-
-        state = state['state']
 
         return jsonify({"state": get_public_state(state),
                         "completion": round(state/MAX_STATE)})
@@ -124,18 +83,10 @@ def create_app(test_config=None):
     def get_address(job_id):
         db = get_db()
 
-        address = None
-
-        with db.cursor() as cur:
-            address = cur.execute(
-                'SELECT address FROM ensicoin WHERE id = %s',
-                (job_id,)
-            ).fetchone()
-
-        if address is None:
+        try:
+            address = db.read("/{}/address".format(job_id))
+        except etcd.EtcdKeyNotFound:
             abort(404)
-
-        address = address['address']
 
         return jsonify({"address": address})
 
@@ -145,16 +96,10 @@ def create_app(test_config=None):
 
         result = None
 
-        with db.cursor() as cur:
-            result = cur.execute(
-                'SELECT segments FROM result WHERE id = %s',
-                (job_id,)
-            ).fetchone()
-
-        if result is None:
+        try:
+            result = db.read("/{}/result".format(job_id))
+        except etcd.EtcdKeyNotFound:
             abort(404)
-
-        result = result['segments']
 
         return jsonify({"result": result})
 
@@ -163,19 +108,9 @@ def create_app(test_config=None):
         db = get_db()
         job_id = ''.join(random.choices(string.ascii_letters, k=20))
 
-        def op(conn):
-            with conn.cursor() as cur:
-                cur.execute(
-                    'INSERT INTO jobs (id, state)'
-                    ' VALUES (%s, %s)',
-                    (job_id, 0)
-                )
+        db.write("/{}/state".format(job_id), 0)
 
-        database.run_transaction(db, op)
-
-        t = threading.Thread(target=init.generate_segments,
-                             args=(job_id, A_PI_ADDRESS))
-        t.start()
+        init.generate_segments(job_id, A_PI_ADDRESS)
 
         return jsonify({"id": job_id})
 
