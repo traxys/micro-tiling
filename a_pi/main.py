@@ -118,7 +118,7 @@ def create_app(test_config=None):
         return 'ok'
 
     @app.route('/', methods=('POST',))
-    def hello():
+    def handle():
         valid = [str(i) for i in range(0, 10)]
         valid.append('π')
 
@@ -133,7 +133,7 @@ def create_app(test_config=None):
                 abort(400)
 
             try:
-                job_current = db.read("/a_pi/{}/segments".format(job)).value
+                job_current = int(db.read("/a_pi/{}/digit".format(job)).value)
             except etcd.EtcdKeyNotFound:
                 if digit == '3':
                     db.write("/a_pi/{}/digit".format(job), 1)
@@ -143,7 +143,6 @@ def create_app(test_config=None):
                 else:
                     abort(400)
 
-            job_current = job_current['digits']
             if digit == 'π':
                 terminate(db, job, mill_stub)
                 return 'OK THX'

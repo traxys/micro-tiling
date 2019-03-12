@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/parnurzeal/gorequest"
 	"github.com/satori/go.uuid"
+	log "github.com/sirupsen/logrus"
 	"go.etcd.io/etcd/client"
-	"log"
 	"math"
 	"math/rand"
 	"os"
@@ -51,11 +51,15 @@ func makePi(total int) chan int {
 		count := 0
 
 		for {
+			log.Debug("pouf")
+
 			if 4*q+r-t < m*t {
 				ch <- m
 				count++
 
 				if count > total {
+					log.Debug("pifpifpif")
+
 					break
 				}
 
@@ -64,6 +68,8 @@ func makePi(total int) chan int {
 				q, r, t, k, m, x = q*k, (2*q+r)*x, t*x, k+1, (q*(7*k+2)+r*x)/(t*x), x+2
 			}
 		}
+
+		log.Debug("hey")
 
 		close(ch)
 	}()
@@ -90,13 +96,17 @@ func generateAndSendSegments(kapi client.KeysAPI, jobId string) {
 			End()
 	}
 
-	request.Post(os.Getenv("A_PI_ADDRESS")).
+	resp, _, _ := request.Post(os.Getenv("A_PI_ADDRESS")).
 		Type("multipart").
 		Send(fmt.Sprintf(`{"job": "%s", "digit": "π"}`, jobId)).
 		End()
+
+	log.WithField("resp", resp).Debug("pi sent")
 }
 
 func main() {
+	log.SetLevel(log.DebugLevel)
+
 	cfg := client.Config{
 		Endpoints: []string{os.Getenv("ETCD_ADDRESS")},
 		Transport: client.DefaultTransport,

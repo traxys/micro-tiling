@@ -13,6 +13,7 @@ require (
 	github.com/parnurzeal/gorequest v0.2.15
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/satori/go.uuid v1.2.0
+	github.com/sirupsen/logrus v1.4.0
 	github.com/ugorji/go v1.1.1 // indirect
 	go.etcd.io/etcd v3.3.12+incompatible
 	golang.org/x/net v0.0.0-20190311183353-d8887717615a // indirect
