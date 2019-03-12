@@ -116,6 +116,31 @@ class Point:
         return 'Point('+str(self.pos.x)+', '+str(self.pos.y)+')'
 
 
+def generate_id_tuple(points):
+    """Generates a tuple for each point (id, x, y, [id of linked])
+    """
+    largest_id = 0
+    tuple_points = []
+    ids = {}
+    # We merge only points matching in get_pos
+    for p in points:
+        linked_id = []
+
+        if not p.get_pos() in ids:
+            ids[p.get_pos()] = largest_id
+            largest_id += 1
+
+        p_id = ids[p.get_pos()]
+        for linked in p.linked:
+            if not linked.get_pos() in ids:
+                ids[linked.get_pos()] = largest_id
+                largest_id += 1
+            linked_id.append(ids[linked.get_pos()])
+        tuple_points.append((p_id, p.get_pos()[0], p.get_pos()[1], linked_id))
+
+    return tuple_points
+
+
 def cut(segments):
     """Cuts the *segments* such that no two segments cross
     """

@@ -72,7 +72,7 @@ class Handler:
                          1,
                          pk2,
                          [job_id,
-                          json.dumps(cut_segments)])
+                          json.dumps(split.generate_id_tuple(cut_segments))])
 
         return '250 Message accepted for delivery'
 
