@@ -44,6 +44,7 @@ class MillServicer(mill_pb2_grpc.MillServicer):
     def Turn(self, request, context):
         """Turns segments contained in the RPC message *request*
         """
+        print("DEEEEEEEEEE")
         status_db = database.open_db()
         database.update_state(status_db, 4, request.id)
 

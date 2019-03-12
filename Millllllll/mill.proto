@@ -24,5 +24,5 @@ message Response {}
 // Turns a Job
 service Mill {
 	// Rotates each segment in a Job
-	rpc Turn (Job) returns (stream Response) {}
+	rpc Turn (Job) returns (Response) {}
 }
