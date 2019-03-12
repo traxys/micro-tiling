@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	MAX_SEGMENTS = 20
-	MIN_SEGMENTS = 5
+	MAX_SEGMENTS = 2
+	MIN_SEGMENTS = 1
 	MAX_STATE    = 42
 )
 
