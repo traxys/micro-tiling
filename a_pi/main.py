@@ -66,7 +66,7 @@ def action(db, job_id, job_current):
 
     db.write("/a_pi/{}/digit".format(job_id), job_current + 1)
 
-    segments = json.loads(db.read("/a_pi/{}/segments".format(job_id)))
+    segments = json.loads(db.read("/a_pi/{}/segments".format(job_id)).value)
     segments.append(segment_generator.random_segment(2, 2))
     db.write("/a_pi/{}/segments".format(job_id), json.dumps(segments))
 
@@ -76,7 +76,7 @@ def terminate(db, job_id, mill_stub):
     """
     database.update_state(database.open_db(), 2, job_id)
 
-    segments = json.loads(db.read("/a_pi/{}/segments".format(job_id)))
+    segments = json.loads(db.read("/a_pi/{}/segments".format(job_id)).value)
 
     segments = [mill_pb2.Segment(
                     a=mill_pb2.Point(
@@ -133,7 +133,7 @@ def create_app(test_config=None):
                 abort(400)
 
             try:
-                job_current = db.read("/a_pi/{}/segments".format(job))
+                job_current = db.read("/a_pi/{}/segments".format(job)).value
             except etcd.EtcdKeyNotFound:
                 if digit == '3':
                     db.write("/a_pi/{}/digit".format(job), 1)
