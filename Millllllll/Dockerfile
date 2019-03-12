@@ -7,5 +7,8 @@ RUN pip install supervisor
 WORKDIR olala
 COPY . .
 
+ENV DATABASE_HOST=localhost
+ENV DATABASE_PORT=2379
+
 EXPOSE 5001 3333
 ENTRYPOINT [ "supervisord", "--nodaemon", "--configuration", "/olala/supervisord.conf" ]

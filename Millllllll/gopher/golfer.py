@@ -6,7 +6,7 @@ import os
 TCP_IP = '127.0.0.1'
 HOST = 'Golfer'
 TCP_PORT = 3333
-FILE_DIR = 'files'
+FILE_DIR = '/olala/gopher/files'
 
 
 def get_entries():
