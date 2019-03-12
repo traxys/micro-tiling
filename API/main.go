@@ -83,12 +83,15 @@ func generateAndSendSegments(kapi client.KeysAPI, jobId string) {
 	request := gorequest.New()
 
 	for digit := range ch {
+		fmt.Println(digit)
 		request.Post(os.Getenv("A_PI_ADDRESS")).
+			Type("multipart").
 			Send(fmt.Sprintf(`{"job": "%s", "digit": "%v"}`, jobId, digit)).
 			End()
 	}
 
 	request.Post(os.Getenv("A_PI_ADDRESS")).
+		Type("multipart").
 		Send(fmt.Sprintf(`{"job": "%s", "digit": "π"}`, jobId)).
 		End()
 }

@@ -17,6 +17,6 @@ def update_state(db, new_state, job_id):
     if it is less than *new_state*
     """
     key = '/{}/state'.format(job_id)
-    old_state = db.read(key).value
+    old_state = int(db.read(key).value)
     if old_state < new_state:
         db.write(key, new_state)
