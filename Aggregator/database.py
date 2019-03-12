@@ -3,7 +3,7 @@ import etcd
 
 
 DATABASE_HOST = os.environ["DATABASE_HOST"]
-DATABASE_PORT = os.environ["DATABASE_PORT"]
+DATABASE_PORT = int(os.environ["DATABASE_PORT"])
 
 
 def open_db():
