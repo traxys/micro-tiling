@@ -70,10 +70,10 @@ def serve():
         MillServicer(), server)
     server.add_insecure_port('[::]:5001')
     server.start()
-    print('hey')
+    
     try:
         while True:
-            time.sleep(1000000)
+            time.sleep(1)
     except KeyboardInterrupt:
         server.stop(0)
 
