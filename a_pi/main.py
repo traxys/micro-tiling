@@ -3,18 +3,15 @@
 """Flask a_pi executing an action on each digit of pi sent
 """
 
+import etcd
 import database
-import sqlite3
 import os
-import click
 from flask import Flask
-from flask import current_app, g, request
-from flask.cli import with_appcontext
+from flask import g, request
 from werkzeug.exceptions import abort
+import json
 
 import grpc
-
-import threading
 
 import mill_pb2
 import mill_pb2_grpc
@@ -31,48 +28,14 @@ def get_db():
     """Get the db associated with the application
     """
     if 'db' not in g:
-        g.db = sqlite3.connect(
-            current_app.config['DATABASE'],
-            detect_types=sqlite3.PARSE_DECLTYPES
-        )
-        g.db.row_factory = sqlite3.Row
-
+        g.db = database.open_db()
     return g.db
 
 
 def close_db(e=None):
     """Closes the DB
     """
-    db = g.pop('db', None)
-
-    if db is not None:
-        db.close()
-
-
-def init_db():
-    """Generates a DB from a `schema.sql` file
-    """
-    db = get_db()
-
-    with current_app.open_resource('schema.sql') as f:
-        db.executescript(f.read().decode('utf8'))
-
-
-@click.command('init-db')
-@with_appcontext
-def init_db_command():
-    """Clear the existing data and create new tables.
-
-    Usable from the command line: `flask init-db`"""
-    init_db()
-    click.echo('Initialized the database.')
-
-
-def init_app(app):
-    """Adds the database functions to the application *app*
-    """
-    app.teardown_appcontext(close_db)
-    app.cli.add_command(init_db_command)
+    g.pop('db', None)
 
 
 def make_pi(total):
@@ -101,17 +64,11 @@ def action(db, job_id, job_current):
                             segment_generator.random_segment
     """
 
-    db.execute(
-        'UPDATE job SET digits = %s'
-        ' WHERE id = %s',
-        (job_current + 1, job_id)
-    )
-    db.execute(
-        'INSERT INTO segment (job_id, x1, y1, x2, y2)'
-        ' VALUES (%s, %s, %s, %s, %s)',
-        (job_id,) + segment_generator.random_segment(2, 2)
-    )
-    db.commit()
+    db.write("/a_pi/{}/digit".format(job_id), job_current + 1)
+
+    segments = json.loads(db.read("/a_pi/{}/segments".format(job_id)))
+    segments.append(segment_generator.random_segment(2, 2))
+    db.write("/a_pi/{}/segments".format(job_id), json.dumps(segments))
 
 
 def terminate(db, job_id, mill_stub):
@@ -119,35 +76,22 @@ def terminate(db, job_id, mill_stub):
     """
     database.update_state(database.open_db(), 2, job_id)
 
-    segments = db.execute(
-        'SELECT x1, y1, x2, y2 FROM segment'
-        ' WHERE job_id = %s',
-        (job_id,)
-    ).fetchall()
+    segments = json.loads(db.read("/a_pi/{}/segments".format(job_id)))
 
     segments = [mill_pb2.Segment(
                     a=mill_pb2.Point(
-                        x=s['x1'],
-                        y=s['y1']),
+                        x=s[0],
+                        y=s[1]),
                     b=mill_pb2.Point(
-                        x=s['x2'],
-                        y=s['y2'])) for s in segments]
+                        x=s[2],
+                        y=s[3])) for s in segments]
 
     mill_stub.Turn(mill_pb2.Job(id=job_id,
                                 segments=segments))
     database.update_state(database.open_db(), 3, job_id)
 
-    db.execute(
-        'DELETE FROM job'
-        ' WHERE id = %s',
-        (job_id,)
-    )
-    db.execute(
-        'DELETE FROM segment'
-        ' WHERE job_id = %s',
-        (job_id,)
-    )
-    db.commit()
+    db.delete("/a_pi/{}/segments".format(job_id))
+    db.delete("/a_pi/{}/digit".format(job_id))
 
 
 def create_app(test_config=None):
@@ -156,15 +100,7 @@ def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
     )
-
-    if test_config is None:
-        # load the instance config, if it exists, when not testing
-        app.config.from_pyfile('config.py', silent=True)
-    else:
-        # load the test config if passed in
-        app.config.from_mapping(test_config)
 
     # ensure the instance folder exists
     try:
@@ -191,42 +127,34 @@ def create_app(test_config=None):
             job = request.form['job']
 
             db = get_db()
-            job_current = db.execute(
-                'SELECT job.digits FROM job WHERE job.id = %s',
-                (job,)
-            ).fetchone()
 
             if digit not in valid:
                 print('unexpected :', digit)
                 abort(400)
 
-            if job_current is None:
+            try:
+                job_current = db.read("/a_pi/{}/segments".format(job))
+            except etcd.EtcdKeyNotFound:
                 if digit == '3':
-                    db.execute(
-                        'INSERT INTO job (id, digits)'
-                        ' VALUES (%s, %s)',
-                        (job, 1)
-                    )
-                    db.commit()
+                    db.write("/a_pi/{}/digit".format(job), 1)
+                    db.write("/a_pi/{}/segments".format(job), "[]")
                     action(db, job, 0)
                     return 'π'
                 else:
                     abort(400)
+
+            job_current = job_current['digits']
+            if digit == 'π':
+                terminate(db, job, mill_stub)
+                return 'OK THX'
+            if pi[job_current] == digit and job_current < MAX_PI:
+                action(db, job, job_current)
+                return 'π'
             else:
-                job_current = job_current['digits']
-                if digit == 'π':
-                    terminate(db, job, mill_stub)
-                    return 'OK THX'
-                if pi[job_current] == digit and job_current < MAX_PI:
-                    action(db, job, job_current)
-                    return 'π'
-                else:
-                    abort(418)
+                abort(418)
 
         else:
             abort(400)
-
-    init_app(app)
 
     return app
 
