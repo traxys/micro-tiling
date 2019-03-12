@@ -27,6 +27,8 @@ def listen():
             segments = json.loads(flags[1])
             job_id = json.loads(flags[0])
 
+        database.update_state(database.open_db(), 26, job_id)
+
         points = solidator.create_points(segments)
         solidator.remove_deg_1(points)
 
@@ -35,3 +37,4 @@ def listen():
         result.close()
 
         database.open_db().write("/{}/result".format(job_id), svg_data)
+        database.update_state(database.open_db(), 31, job_id)

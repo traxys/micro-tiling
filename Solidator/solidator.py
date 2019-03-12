@@ -11,6 +11,7 @@ from os.path import abspath
 from os import getpid, mkfifo, system
 from time import sleep
 import sys
+import database
 
 
 class Vect:
@@ -106,7 +107,7 @@ def open_process(point):
     return proc
 
 
-def remove_deg_1(points, multiprocess=True):
+def remove_deg_1(points, job_id, multiprocess=True):
     '''Write an svg with only closed polygons displayed
     '''
     if multiprocess:
@@ -132,6 +133,8 @@ def remove_deg_1(points, multiprocess=True):
         for p in points:
             p.msg = open('msg_' + str(p.id), 'w')
 
+        database.update_state(database.open_db(), 27, job_id)
+
         # wait untill every process has finished starting up
         unprepared_processes = len(points)
         while unprepared_processes:
@@ -140,6 +143,8 @@ def remove_deg_1(points, multiprocess=True):
             if m == 'r':
                 unprepared_processes -= 1
             sleep(0.1)
+
+        database.update_state(database.open_db(), 28, job_id)
 
         # tell each process the position of the point they represent
         # and the id of their neighbours
@@ -161,7 +166,9 @@ def remove_deg_1(points, multiprocess=True):
                 number_deg1 -= 1
             print('deg1 left :', number_deg1)
             sleep(0.1)
-    
+
+        database.update_state(database.open_db(), 29, job_id)
+
         # write svg header
         res = open('result.svg', 'w')
         res.write('<svg width="600" height="600">\n')
@@ -189,6 +196,8 @@ def remove_deg_1(points, multiprocess=True):
         res.write('</svg>\n')
         res.flush()
         res.close()
+
+        database.update_state(database.open_db(), 30, job_id)
 
         # cleanup all fifos
         system('rm msg_*')
