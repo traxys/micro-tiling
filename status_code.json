@@ -22,5 +22,13 @@
   20: "cruxingator_recieved_mail",
   21: "cruxingator_cutting",
   22: "cruxingator_cut_segments",
-  23: "cruxingator_waiting_fees"
+  23: "cruxingator_waiting_fees",
+  24: "cruxingator_sent_tx",
+  25: "solidator_recieved_public_key",
+  26: "solidator_saw_tx",
+  27: "solidator_launched_all_services",
+  28: "solidator_all_process_ready",
+  29: "solidator_all_process_died",
+  30: "solidator_generated_svg",
+  31: "solidator_wrote_result_to_db"
 }
