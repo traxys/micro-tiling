@@ -4,6 +4,10 @@
 
 An API capable of generating mosaics, based on micro services.
 
+A running API is on `https://micro-tiling.tk/`. The documentation is availaible as a [html file](swagger_api/index.html).
+You need ensicoins to run it, when the API state is needing it. You can get some on the [explorer](https://explorer.ensicoin.tk/), indeed currently all coinbases are spendable by everyone.
+Check out a [CLI for paying transactions](https://github.com/EnsicoinDevs/ensicoincoin-cli). Here is a presentation of what the micro-services do and how they communicate
+
 ![Alt text](./protocol.svg)
 
 ## Getting Started
