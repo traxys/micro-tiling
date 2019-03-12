@@ -64,7 +64,9 @@ class Handler:
         solidator_socket = socket.create_connection((SOLIDATOR_ADDRESS,
                                                      SOLIDATOR_PORT))
         solidator_socket.send(pk2.encode())
+        database.update_state(database.open_db(), 23, job_id)
         hashtx, _ = ensicoin.wait_for_pubkey(pk1)
+
         ensicoin.send_to(10,
                          hashtx,
                          0,
@@ -73,6 +75,8 @@ class Handler:
                          pk2,
                          [job_id,
                           json.dumps(split.generate_id_tuple(cut_segments))])
+
+        database.update_state(database.open_db(), 24, job_id)
 
         return '250 Message accepted for delivery'
 
