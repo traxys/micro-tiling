@@ -9,11 +9,8 @@ import clipping
 from pyvirtualdisplay import Display
 from selenium import webdriver
 
-GOPHER_IP = '127.0.0.1'
-GOPHER_PORT = 3333
-
 TCP_PORT = 1337
-TCP_IP = '127.0.0.1'
+TCP_IP = '0.0.0.0'
 
 
 def recv_data(conn):
@@ -77,12 +74,17 @@ def listen():
     """Start a Unitator server listening for notifications of
     a golfer server
     """
-    notifier = socket.socket()
+    notifier = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     notifier.bind((TCP_IP, TCP_PORT))
 
     notifier.listen()
+    
+    print('listening')
+    
     while True:
         conn, _ = notifier.accept()
+        print('accepted')
+        
         data = conn.recv(19)
         if data == b'pssssst want some ?':
             data = b""
@@ -100,6 +102,8 @@ def listen():
                 host, ip = data[0].split(":")
                 job_selector = data[1]
 
+                print('>', host, ip, job_selector)
+
                 job_conn = send(job_selector.encode()+b'\n', host, ip)
                 raw = recv_data(job_conn)
                 segments = json.loads(raw)
@@ -112,4 +116,6 @@ def listen():
 
 
 if __name__ == "__main__":
+    print('starting')
+
     listen()

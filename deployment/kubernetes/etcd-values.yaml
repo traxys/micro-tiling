@@ -1,0 +1,6 @@
+customResources:
+  createEtcdClusterCRD: true
+  createBackupCRD: true
+  createRestoreCRD: true
+cluster:
+  enabled: true

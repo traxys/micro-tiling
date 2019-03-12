@@ -3,12 +3,12 @@ from os import listdir
 from os.path import isfile, join
 import os
 
-TCP_IP = '127.0.0.1'
+TCP_IP = '0.0.0.0'
 HOST = 'Golfer'
 TCP_PORT = 3333
 FILE_DIR = '/olala/gopher/files'
 DEFAULT_NOTIFIER = os.environ["DEFAULT_NOTIFIER"]
-
+POD_IP = os.environ["POD_IP"]
 
 def get_entries():
     """returns `[(DirEntry)]` as defined by the gopher protocol
@@ -43,7 +43,10 @@ def main():
     listener.listen()
     print("Golfer started on port", TCP_PORT)
 
-    notifications = [DEFAULT_NOTIFIER]
+    notifications = [DEFAULT_NOTIFIER.split(':')]
+    notifications[0][1] = int(notifications[0][1])
+
+    print("Notifications:", notifications)
 
     while True:
         conn, addr = listener.accept()
@@ -63,9 +66,10 @@ def main():
                 if len(data) == 2:
                     for addr in notifications:
                         try:
+                            print('sending a notification to', addr)
                             notifier = socket.create_connection(addr)
                             notifier.send(b"pssssst want some ?" +
-                                          TCP_IP.encode() +
+                                          POD_IP.encode() +
                                           b":" +
                                           str(TCP_PORT).encode() +
                                           b"|0/" +

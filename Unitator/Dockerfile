@@ -1,12 +1,14 @@
-FROM leafney/alpine-selenium-firefox:latest
+FROM alpine:latest
 
-RUN apk update
-RUN apk add python3 py-pip py-psycopg2
-RUN pip3 install pyvirtualdisplay selenium
-RUN pip3 install python-etcd
+RUN apk add python py-pip curl unzip dbus-x11 ttf-freefont firefox-esr xvfb py-pip curl dbus-x11 ttf-freefont firefox-esr xvfb python3 py-pip py-psycopg2 dumb-init
+RUN pip3 install pyvirtualdisplay selenium pyvirtualdisplay python-etcd
 
 WORKDIR /app
 COPY . .
 
+RUN cp geckodriver /usr/local/bin
+RUN chmod +x /usr/local/bin/geckodriver
+
 EXPOSE 1337
-CMD [ "./init.sh" ]
+
+ENTRYPOINT [ "/usr/bin/dumb-init", "--", "/app/start.sh" ]
