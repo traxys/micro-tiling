@@ -3,6 +3,8 @@ import ensicoin
 import json
 import solidator
 import database
+import os
+import shutil
 
 TCP_IP = "127.0.0.1"
 TCP_PORT = 2442
@@ -30,11 +32,16 @@ def listen():
         database.update_state(database.open_db(), 26, job_id)
 
         points = solidator.create_points(segments)
-        solidator.remove_deg_1(points)
+        os.mkdir(job_id)
+        os.chdir(job_id)
+        solidator.remove_deg_1(points, job_id)
 
         result = open("result.svg", "r")
         svg_data = result.read()
         result.close()
+
+        os.chdir("..")
+        shutil.rmtree(job_id)
 
         database.open_db().write("/{}/result".format(job_id), svg_data)
         database.update_state(database.open_db(), 31, job_id)
