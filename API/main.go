@@ -21,6 +21,10 @@ const (
 	MAX_STATE    = 42
 )
 
+var (
+	Pi = []int{3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5, 8, 9, 7, 9, 3, 2, 3, 8, 4, 6, 2, 6, 4, 3, 3, 8, 3, 2, 7, 9, 5, 0, 2, 8, 8, 4, 1, 9, 7, 1, 6, 9, 3}
+)
+
 func getPublicState(state int) string {
 	if state == -1 {
 		return "error"
@@ -43,42 +47,8 @@ func getPublicState(state int) string {
 	return ""
 }
 
-func makePi(total int) chan int {
-	ch := make(chan int)
-
-	go func() {
-		q, r, t, k, m, x := 1, 0, 1, 1, 3, 3
-		count := 0
-
-		for {
-			log.Debug("pouf")
-
-			if 4*q+r-t < m*t {
-				ch <- m
-				count++
-
-				if count > total {
-					log.Debug("pifpifpif")
-
-					break
-				}
-
-				q, r, t, k, m, x = 10*q, 10*(r-m*t), t, k, (10*(3*q+r))/t-10*m, x
-			} else {
-				q, r, t, k, m, x = q*k, (2*q+r)*x, t*x, k+1, (q*(7*k+2)+r*x)/(t*x), x+2
-			}
-		}
-
-		log.Debug("hey")
-
-		close(ch)
-	}()
-
-	return ch
-}
-
 func generateAndSendSegments(kapi client.KeysAPI, jobId string) {
-	ch := makePi(rand.Intn(MAX_SEGMENTS-MIN_SEGMENTS) + MIN_SEGMENTS)
+	digits := rand.Intn(MAX_SEGMENTS-MIN_SEGMENTS) + MIN_SEGMENTS
 
 	_, err := kapi.Set(context.Background(), fmt.Sprintf("/%s/state", jobId), "1", nil)
 	if err != nil {
@@ -88,20 +58,18 @@ func generateAndSendSegments(kapi client.KeysAPI, jobId string) {
 
 	request := gorequest.New()
 
-	for digit := range ch {
-		fmt.Println(digit)
+	for i := 0; i < digits; i++ {
+		log.Debug(Pi[i])
 		request.Post(os.Getenv("A_PI_ADDRESS")).
 			Type("multipart").
-			Send(fmt.Sprintf(`{"job": "%s", "digit": "%v"}`, jobId, digit)).
+			Send(fmt.Sprintf(`{"job": "%s", "digit": "%v"}`, jobId, Pi[i])).
 			End()
 	}
 
-	resp, _, _ := request.Post(os.Getenv("A_PI_ADDRESS")).
+	request.Post(os.Getenv("A_PI_ADDRESS")).
 		Type("multipart").
 		Send(fmt.Sprintf(`{"job": "%s", "digit": "π"}`, jobId)).
 		End()
-
-	log.WithField("resp", resp).Debug("pi sent")
 }
 
 func main() {
@@ -150,6 +118,7 @@ func main() {
 
 		c.JSON(200, gin.H{
 			"state":      getPublicState(state),
+			"realState":  state,
 			"completion": math.Round(float64(state) / MAX_STATE),
 		})
 	})

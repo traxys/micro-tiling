@@ -3,6 +3,7 @@ module API
 go 1.12
 
 require (
+	github.com/claygod/PiHex v0.0.0-20171002051846-c8544d635121
 	github.com/coreos/etcd v3.3.12+incompatible // indirect
 	github.com/coreos/go-semver v0.2.0 // indirect
 	github.com/gin-contrib/sse v0.0.0-20190301062529-5545eab6dad3 // indirect

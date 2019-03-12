@@ -1,3 +1,5 @@
+github.com/claygod/PiHex v0.0.0-20171002051846-c8544d635121 h1:GNFeMJPLwfy7tavvf1vB0goJY40YP0BQ2w2Fj80x/cM=
+github.com/claygod/PiHex v0.0.0-20171002051846-c8544d635121/go.mod h1:iQyqZlmS/QK9N12+07jX1OO2xlzguGIE7vDmHh3TX+E=
 github.com/coreos/etcd v3.3.12+incompatible h1:pAWNwdf7QiT1zfaWyqCtNZQWCLByQyA3JrSQyuYAqnQ=
 github.com/coreos/etcd v3.3.12+incompatible/go.mod h1:uF7uidLiAD3TWHmW31ZFd/JWoc32PjwdhPthX9715RE=
 github.com/coreos/go-semver v0.2.0 h1:3Jm3tLmsgAYcjC+4Up7hJrFBPr+n7rAqYeSw/SZazuY=

@@ -63,11 +63,13 @@ class MillServicer(mill_pb2_grpc.MillServicer):
 def serve():
     """Start the Millllllll server
     """
+    print('starting millllllll server...')
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     mill_pb2_grpc.add_MillServicer_to_server(
         MillServicer(), server)
     server.add_insecure_port('[::]:5001')
     server.start()
+    print('hey')
     try:
         while True:
             time.sleep(1000000)
