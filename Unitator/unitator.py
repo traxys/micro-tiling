@@ -80,10 +80,6 @@ def listen():
     notifier = socket.socket()
     notifier.bind((TCP_IP, TCP_PORT))
 
-    send(b'!/notify '
-         + (TCP_IP+':'+str(TCP_PORT)).encode()
-         + b'\n', GOPHER_IP, GOPHER_PORT)
-
     notifier.listen()
     while True:
         conn, _ = notifier.accept()

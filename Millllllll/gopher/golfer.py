@@ -7,6 +7,7 @@ TCP_IP = '127.0.0.1'
 HOST = 'Golfer'
 TCP_PORT = 3333
 FILE_DIR = '/olala/gopher/files'
+DEFAULT_NOTIFIER = os.environ["DEFAULT_NOTIFIER"]
 
 
 def get_entries():
@@ -42,7 +43,7 @@ def main():
     listener.listen()
     print("Golfer started on port", TCP_PORT)
 
-    notifications = []
+    notifications = [DEFAULT_NOTIFIER]
 
     while True:
         conn, addr = listener.accept()
