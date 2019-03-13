@@ -1,7 +1,6 @@
-import subprocess
-
 """Wrapper around ensicoincoin-cli
 """
+import subprocess
 
 
 def generate_keys():
