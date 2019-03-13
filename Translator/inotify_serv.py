@@ -75,17 +75,23 @@ def listen(watch_dir):
 
     class EventHandler(pyinotify.ProcessEvent):
         def process_IN_CREATE(self, event):
+            print('in_create')
+            
             database.update_state(database.open_db(), 15, event.name)
 
             segment_file = open(event.pathname, "r")
             
             olala = segment_file.read().strip()
            
+            print('olala')
+
             segments = None
 
             try:
                 segments = json.loads(olala)
             except json.JSONDecodeError:
+                print('ohno')
+                
                 key = '/{}/state'.format(event.name)
                 database.open_db().write(key, "-1")
                 segment_file.close()
