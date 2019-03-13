@@ -202,6 +202,8 @@ spec:
               value: "etcd-cluster-client"
             - name: DATABASE_PORT
               value: "2379"
+            - name: SMTP_ADDR:
+              value: "cruxingator-service:8025"
 ---
 apiVersion: v1
 kind: Service
@@ -212,8 +214,8 @@ spec:
     app: cruxingator
   ports:
     - name: cruxingator
-      port: 25
-      targetPort: 25
+      port: 8025
+      targetPort: 8025
 ---
 apiVersion: apps/v1
 kind: Deployment

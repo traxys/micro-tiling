@@ -7,7 +7,7 @@ import translator
 import database
 
 WATCH_DIR = '/app/jobs'
-SMTP_HOST = 'localhost:8025'
+SMTP_ADDR = os.environ['SMTP_ADDR']
 
 
 def translation(segments, job_id, gpg):
@@ -76,14 +76,19 @@ def listen(watch_dir):
 
             segment_file = open(event.pathname, "r")
             
-            print(segment_file.read())
+            olala = segment_file.read().strip()
            
+            segments = None
+
             try:
-                segments = json.loads(segment_file.read())
+                segments = json.loads(olala)
             except json.JSONDecodeError:
                 key = '/{}/state'.format(event.name)
                 database.open_db().write(key, "-1")
-            
+                segment_file.close()
+                os.remove(event.pathname)
+                return
+
             segment_file.close()
 
             translation(segments, event.name, gpg)
