@@ -1,5 +1,5 @@
 Translator Service
 ==================
 
-.. automodule:: Translator.inotify_serv
+.. automodule:: Translator.app
     :members:
