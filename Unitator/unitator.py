@@ -36,18 +36,27 @@ def send(data, host, port):
 def unit(segments, job_id):
     """Clip *segments* of the job *job_id* into a unit square and forwards them
     """
+    print("segments:", segments)
+    
     segments = [clipping.segment(
                     clipping.p(segment[0][0], segment[0][1]),
                     clipping.p(segment[1][0], segment[1][1])
                 ) for segment in segments]
 
+    print("segments1:", segments)
+
     clipped_segments = clipping.clip_unit_square(segments)
     database.update_state(database.open_db(), 10, job_id)
+
+    print("clipped_segments:", clipped_segments)
 
     tuple_segments = [(
                         (segment.a.x, segment.a.y),
                         (segment.b.x, segment.b.y)
                       ) for segment in clipped_segments]
+    
+    print("tuple_segments:", tuple_segments)
+    
     write(job_id,
           json.dumps(tuple_segments, indent=4))
 
@@ -55,6 +64,8 @@ def unit(segments, job_id):
 def write(job_id, text):
     """Writes a *text* by an html form
     """
+    print(text)
+    
     database.update_state(database.open_db(), 11, job_id)
     display = Display(visible=0, size=(1024, 768))
     display.start()
@@ -107,6 +118,8 @@ def listen():
                 job_conn = send(job_selector.encode()+b'\n', host, ip)
                 raw = recv_data(job_conn)
                 segments = json.loads(raw)
+
+                print(raw, segments)
 
                 send(b'!/delete '+job_selector.encode()+b'\n', host, ip)
 

@@ -87,7 +87,7 @@ class Handler:
 
 
 if __name__ == "__main__":
-    controller = Controller(Handler())
+    controller = Controller(Handler(), hostname="0.0.0.0")
     controller.start()
 
     while True:

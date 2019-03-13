@@ -6,7 +6,7 @@ import database
 import os
 import shutil
 
-TCP_IP = "127.0.0.1"
+TCP_IP = "0.0.0.0"
 TCP_PORT = 2442
 
 
@@ -45,3 +45,7 @@ def listen():
 
         database.open_db().write("/{}/result".format(job_id), svg_data)
         database.update_state(database.open_db(), 31, job_id)
+
+if __name__ == "__main__":
+    print('starting solidator')
+    listen()

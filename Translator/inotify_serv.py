@@ -6,7 +6,7 @@ import gnupg
 import translator
 import database
 
-WATCH_DIR = 'jobs'
+WATCH_DIR = '/app/jobs'
 SMTP_HOST = 'localhost:8025'
 
 
@@ -75,12 +75,15 @@ def listen(watch_dir):
             database.update_state(database.open_db(), 15, event.name)
 
             segment_file = open(event.pathname, "r")
+            
+            print(segment_file.read())
+           
             try:
                 segments = json.loads(segment_file.read())
             except json.JSONDecodeError:
                 key = '/{}/state'.format(event.name)
                 database.open_db().write(key, "-1")
-
+            
             segment_file.close()
 
             translation(segments, event.name, gpg)

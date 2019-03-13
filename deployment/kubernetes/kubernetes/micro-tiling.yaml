@@ -1,0 +1,168 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+spec:
+  selector:
+    app: api
+  ports:
+    - name: web
+      port: 80
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api-pod
+          image: microtiling/api
+          imagePullPolicy: Always
+          env:
+            - name: A_PI_ADDRESS
+              value: "http://a-pi-service:80"
+            - name: ETCD_ADDRESS
+              value: "http://etcd-cluster-client:2379"
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: micro-tiling-api
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.frontend.priority: "1"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        backend:
+          serviceName: api-service
+          servicePort: web
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: a-pi-service
+spec:
+  selector:
+    app: a-pi
+  ports:
+    - port: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: a-pi-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: a-pi
+  template:
+    metadata:
+      labels:
+        app: a-pi
+    spec:
+      containers:
+        - name: a-pi-pod
+          image: microtiling/a_pi
+          imagePullPolicy: Always
+          env:
+            - name: MILLLLLLLL_ADDR
+              value: "millllllll-service:5001"
+            - name: DATABASE_HOST
+              value: "etcd-cluster-client"
+            - name: DATABASE_PORT
+              value: "2379"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: millllllll-service
+spec:
+  selector:
+    app: millllllll
+  ports:
+    - name: gopher
+      port: 3333
+      targetPort: 3333
+    - name: millllllll
+      port: 5001
+      targetPort: 5001
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: millllllll-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: millllllll
+  template:
+    metadata:
+      labels:
+        app: millllllll
+    spec:
+      containers:
+        - name: millllllll-pod
+          image: microtiling/millllllll
+          imagePullPolicy: Always
+          env:
+            - name: DATABASE_HOST
+              value: "etcd-cluster-client"
+            - name: DATABASE_PORT
+              value: "2379"
+            - name: DEFAULT_NOTIFIER
+              value: "unitator-service:1337"
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: unitator-service
+spec:
+  selector:
+    app: unitator
+  ports:
+    - name: unitator
+      port: 1337
+      targetPort: 1337
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unitator-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: unitator
+  template:
+    metadata:
+      labels:
+        app: unitator
+    spec:
+      containers:
+        - name: unitator-pod
+          image: microtiling/unitator
+          imagePullPolicy: Always
+          env:
+            - name: DATABASE_HOST
+              value: "etcd-cluster-client"
+            - name: DATABASE_PORT
+              value: "2379"
