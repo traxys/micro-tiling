@@ -22,6 +22,13 @@ Welcome to Micro Tiling's documentation!
    Cruxingator/index
    Solidator/index
 
+REST API Usage
+==============
+
+A running API is hosted at ``https://micro-tiling.tk``
+
+.. swaggerv2doc:: swagger.json
+
 Indices and tables
 ==================
 
