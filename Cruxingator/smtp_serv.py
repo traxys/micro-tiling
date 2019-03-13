@@ -20,6 +20,8 @@ if "SOLIDATOR_PORT" in os.environ:
 
 
 def decrypt(string):
+    """Decrypts the *string* using gpg
+    """
     gpg = gnupg.GPG(gnupghome='.')
 
     sec_file = open("keys/sec.gpg", "r")
@@ -35,12 +37,16 @@ def decrypt(string):
 
 
 class Handler:
+    """Handles SMTP requests
+    """
     async def handle_RCPT(self,
                           server,
                           session,
                           envelope,
                           address,
                           rcpt_options):
+        """Refuse all mails not in @micro-tiling.tk
+        """
         if not address.endswith('@micro-tiling.tk'):
             return '550 not relaying to that domain'
 
@@ -48,6 +54,8 @@ class Handler:
         return '250 OK'
 
     async def handle_DATA(self, server, session, envelope):
+        """Handles the content of a mail
+        """
         message = envelope.content.decode('utf8', errors='replace')
         message = decrypt(message)
 
