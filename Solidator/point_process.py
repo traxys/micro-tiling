@@ -40,7 +40,7 @@ def debug(string, own_id):
 def read_position():
     """Reads a line from **stdin** and interprets it as a position
     """
-    return [int(coord) for coord in sys.stdin.readline().split()]
+    return [float(coord) for coord in sys.stdin.readline().split()]
 
 
 def read_neighbours(amount):
