@@ -9,8 +9,8 @@ def generate_keys():
     output = subprocess.check_output(['ensicoincoin-cli', 'createwallet'])
     priv_key, pub_key = output.decode('ASCII').split('\n')[:2]
 
-    priv_key = priv_key.split(':')[1]
-    pub_key = pub_key.split(':')[1]
+    priv_key = priv_key.split(':')[1].strip()
+    pub_key = pub_key.split(':')[1].strip()
 
     return (priv_key, pub_key)
 

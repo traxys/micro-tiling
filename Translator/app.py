@@ -16,6 +16,8 @@ if "SMTP_ADDR" in os.environ:
 def translation(segments, job_id, gpg):
     """Creates replicas of the segments in the eight directions
     """
+    print('translating')
+
     segments = translator.translate_segments(segments, True)
 
     database.update_state(database.open_db(), 16, job_id)
@@ -36,6 +38,8 @@ def send(host, segments, job_id, gpg):
     """
     import smtplib
 
+    print('sending')
+
     sender = "translator@micro-tiling.tk"
     receivers = ["cruxingator@micro-tiling.tk"]
     message = """{}|""".format(job_id)
@@ -47,7 +51,7 @@ def send(host, segments, job_id, gpg):
     database.update_state(database.open_db(), 18, job_id)
 
     smtpObj = smtplib.SMTP(host)
-    smtpObj.sendmail(sender, receivers, message.encode())
+    print(smtpObj.sendmail(sender, receivers, message.encode()))
     database.update_state(database.open_db(), 19, job_id)
 
 
@@ -56,7 +60,6 @@ def create_app(test_config=None):
     """
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
-    subprocess.Popen(["python3", "inotify_serv.py"])
 
     # ensure the instance folder exists
     try:
@@ -76,12 +79,16 @@ def create_app(test_config=None):
     def on_post():
         """Fetches segments and job_id from POST
         """
+
         job_id = request.form['job']
         segments = json.loads(request.form['message'])
+
+        print('new job', job_id, segments)
 
         database.update_state(database.open_db(), 14, request.form['job'])
 
         translation(segments, job_id, gpg)
+
         return ""
 
     return app

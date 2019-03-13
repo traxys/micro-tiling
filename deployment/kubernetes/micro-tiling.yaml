@@ -239,7 +239,7 @@ spec:
             - name: DATABASE_HOST
               value: "etcd-cluster-client"
             - name: DATABASE_PORT
-              value: "8025"
+              value: "2379"
             - name: API_NODE
               value: "ensicoincoin-service:4225"
             - name: SOLIDATOR_ADDRESS
@@ -281,7 +281,7 @@ spec:
             - name: DATABASE_HOST
               value: "etcd-cluster-client"
             - name: DATABASE_PORT
-              value: "8025"
+              value: "2379"
             - name: API_NODE
               value: "ensicoincoin-service:4225"
 ---
