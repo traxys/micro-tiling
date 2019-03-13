@@ -42,6 +42,8 @@ func getPublicState(state int) string {
 		return "cutting segments"
 	} else if state == 23 {
 		return "waiting fees"
+	} else if state <= 31 {
+		return "pruning segments"
 	}
 
 	return ""
