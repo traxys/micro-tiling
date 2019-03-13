@@ -19,6 +19,7 @@ sys.path.insert(0, os.path.abspath("../a_pi"))
 sys.path.insert(0, os.path.abspath("../Millllllll"))
 sys.path.insert(0, os.path.abspath("../Unitator"))
 sys.path.insert(0, os.path.abspath("../Translator"))
+sys.path.insert(0, os.path.abspath("../Cruxingator"))
 # sys.path.insert(0, path / 'API')
 # sys.path.insert(0, path / 'a_pi')
 

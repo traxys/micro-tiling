@@ -6,8 +6,11 @@
 Cruxingator
 ======================================
 
+This service cuts all segments such that no two segments cross, and publishes the result in an ensicoin transaction
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
     
+   smtp_serv
    split

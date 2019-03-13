@@ -6,6 +6,8 @@
 Millllllll
 ======================================
 
+This service is rotating segments on a gRPC call
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
