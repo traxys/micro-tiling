@@ -12,7 +12,7 @@
   10: "unitator_clipped",
   11: "unitator_writing_segments",
   12: "unitator_sent_segments",
-  13: "translator_recieved_segments",
+  13: "translator_received_segments",
   14: "translator_wrote_segments",
   15: "translator_picked_inotify",
   16: "translator_translated",
