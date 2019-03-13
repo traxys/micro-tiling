@@ -60,6 +60,9 @@ def signal_death(neighbour_messagers, own_id):
         fifo.flush()
     debug('I DIED !!!\n', own_id)
 
+def death_ack(fifo):
+    fifo.write('a\n')
+    fifo.flush()
 
 def who_am_i_at_the_end(is_dead, neighbour_messagers, own_id, position):
     """Tells all neighbours by *neighbour_messagers*
@@ -67,12 +70,12 @@ def who_am_i_at_the_end(is_dead, neighbour_messagers, own_id, position):
     else send them D
     """
     if is_dead:
-        for msg in neighbour_messager:
+        for msg in neighbour_messagers:
             msg.write('D\n')
             msg.flush()
             msg.close()
     else:
-        for msg in neighbour_messager:
+        for msg in neighbour_messagers:
             msg.write('A ' +
                       str(own_id) +
                       ' ' +
@@ -123,9 +126,9 @@ def main():
     position = read_position()
 
     # find neighbours
-    neighbours_pid = read_neighbours(n_of_neighbours)
+    neighbours_id = read_neighbours(n_of_neighbours)
     write_neighbours = [open('msg_' + str(point_id), 'w')
-                        for point_id in neighbours_pid]
+                        for point_id in neighbours_id]
 
     dead_processes = 0
     n_of_live_neighbours = n_of_neighbours
@@ -133,6 +136,7 @@ def main():
     # states
     dead = False
     end = False
+    neighbour_knows_im_dead = False
 
     while not(end) or dead_processes < n_of_neighbours:
         if not(dead) and n_of_live_neighbours == 1:
@@ -140,6 +144,7 @@ def main():
             dead = True
 
         m = messages.readline()
+        debug("received message : "+m+"\n", own_id)
 
         if m[0] == 'e':
             end = True
@@ -147,12 +152,19 @@ def main():
             who_am_i_at_the_end(dead, write_neighbours, own_id, position)
 
         elif m[0] == 'd':
-            if not dead:
+            debug("one of my neighbours died\n", own_id)
+            
+            dead_id = int(m.split()[1])
+            death_ack(write_neighbours[neighbours_id.index(dead_id)])
+            if not neighbour_knows_im_dead:
                 debug("one of my neighbours died !\n", own_id)
                 n_of_live_neighbours -= 1
                 if n_of_live_neighbours == 0 or n_of_live_neighbours >= 2:
                     write_main.write('d')
                     write_main.flush()
+
+        elif m[0] == 'a':
+            neighbour_knows_im_dead = True
 
         elif m[0] == 'D':
             dead_processes += 1
