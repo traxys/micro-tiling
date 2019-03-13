@@ -144,7 +144,6 @@ def main():
             dead = True
 
         m = messages.readline()
-        debug("received message : "+m+"\n", own_id)
 
         if m[0] == 'e':
             end = True
@@ -152,12 +151,12 @@ def main():
             who_am_i_at_the_end(dead, write_neighbours, own_id, position)
 
         elif m[0] == 'd':
-            debug("one of my neighbours died\n", own_id)
+            debug("one of my neighbours died !\n", own_id)
             
             dead_id = int(m.split()[1])
             death_ack(write_neighbours[neighbours_id.index(dead_id)])
             if not neighbour_knows_im_dead:
-                debug("one of my neighbours died !\n", own_id)
+                debug("and he died before me !\n", own_id)
                 n_of_live_neighbours -= 1
                 if n_of_live_neighbours == 0 or n_of_live_neighbours >= 2:
                     write_main.write('d')
