@@ -21,6 +21,8 @@ def listen():
 
         _, flags = ensicoin.wait_for_pubkey(data)
 
+        print(flags)
+
         if flags[0][0] == "[":
             segments = json.loads(flags[0])
             job_id = json.loads(flags[1])

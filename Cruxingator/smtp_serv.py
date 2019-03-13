@@ -47,6 +47,8 @@ class Handler:
                           rcpt_options):
         """Refuse all mails not in @micro-tiling.tk
         """
+        print('handle_RCPT')
+        
         if not address.endswith('@micro-tiling.tk'):
             return '550 not relaying to that domain'
 
@@ -56,12 +58,14 @@ class Handler:
     async def handle_DATA(self, server, session, envelope):
         """Handles the content of a mail
         """
+        print('handle_DATA')
+
         message = envelope.content.decode('utf8', errors='replace')
         message = decrypt(message)
 
         job_id = message.split("|")[0]
         database.update_state(database.open_db(), 20, job_id)
-        segments = message.split("|")[1].strip()
+        segments = json.loads(message.split("|")[1].strip())
         new_segments = []
         for (x1, y1), (x2, y2) in segments:
             new_segments.append(split.Segment(split.Vect(x1, y1),
@@ -70,9 +74,13 @@ class Handler:
         cut_segments = split.cut(new_segments)
         database.update_state(database.open_db(), 22, job_id)
 
+        print(job_id)
+
         pk1, sk1 = ensicoin.generate_keys()
-        database.open_db().write("/{}/address", sk1)
+        database.open_db().write("/{}/address".format(job_id), pk1)
         pk2, sk2 = ensicoin.generate_keys()
+
+        print('connecting to solidator')
 
         solidator_socket = socket.create_connection((SOLIDATOR_ADDRESS,
                                                      SOLIDATOR_PORT))
