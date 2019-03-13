@@ -7,7 +7,10 @@ import translator
 import database
 
 WATCH_DIR = '/app/jobs'
-SMTP_ADDR = os.environ['SMTP_ADDR']
+
+SMTP_ADDR = "localhost"
+if "SMTP_ADDR" in os.environ:
+    SMTP_ADDR = os.environ['SMTP_ADDR']
 
 
 def translation(segments, job_id, gpg):
@@ -17,7 +20,7 @@ def translation(segments, job_id, gpg):
 
     database.update_state(database.open_db(), 16, job_id)
 
-    send(SMTP_HOST, segments, job_id, gpg)
+    send(SMTP_ADDR, segments, job_id, gpg)
 
 
 def encode(string):
