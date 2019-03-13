@@ -12,6 +12,7 @@ Welcome to Micro Tiling's documentation!
 
    bf_interpreter
    database
+   ensicoin
    golfer/index
    client_library/index
    a_pi/index

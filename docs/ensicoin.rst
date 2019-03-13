@@ -1,0 +1,2 @@
+.. automodule:: ensicoin
+   :members:
