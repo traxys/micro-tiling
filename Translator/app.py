@@ -52,6 +52,8 @@ def send(host, segments, job_id, gpg):
 
 
 def create_app(test_config=None):
+    """Launches the flask web application
+    """
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     subprocess.Popen(["python3", "inotify_serv.py"])
@@ -71,7 +73,9 @@ def create_app(test_config=None):
 
     # a simple page that says hello
     @app.route('/', methods=("POST",))
-    def write_to_file():
+    def on_post():
+        """Fetches segments and job_id from POST
+        """
         job_id = request.form['job']
         segments = json.loads(request.form['message'])
 
