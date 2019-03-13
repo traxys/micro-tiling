@@ -166,3 +166,155 @@ spec:
               value: "etcd-cluster-client"
             - name: DATABASE_PORT
               value: "2379"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: translator-service
+spec:
+  selector:
+    app: translator
+  ports:
+    - name: translator
+      port: 1902
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: translator-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: translator
+  template:
+    metadata:
+      labels:
+        app: translator
+    spec:
+      containers:
+        - name: translator-pod
+          image: microtiling/translator
+          imagePullPolicy: Always
+          env:
+            - name: DATABASE_HOST
+              value: "etcd-cluster-client"
+            - name: DATABASE_PORT
+              value: "2379"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cruxingator-service
+spec:
+  selector:
+    app: cruxingator
+  ports:
+    - name: cruxingator
+      port: 25
+      targetPort: 25
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cruxingator-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cruxingator
+  template:
+    metadata:
+      labels:
+        app: cruxingator
+    spec:
+      containers:
+        - name: cruxingator-pod
+          image: microtiling/cruxingator
+          imagePullPolicy: Always
+          env:
+            - name: DATABASE_HOST
+              value: "etcd-cluster-client"
+            - name: DATABASE_PORT
+              value: "8025"
+            - name: API_NODE
+              value: "ensicoincoin-service:4225"
+            - name: SOLIDATOR_ADDRESS
+              value: "solidator-service"
+            - name: SOLIDATOR_PORT
+              value: "2442"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: solidator-service
+spec:
+  selector:
+    app: solidator
+  ports:
+    - name: solidator
+      port: 2442
+      targetPort: 2442
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: solidator-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: solidator
+  template:
+    metadata:
+      labels:
+        app: solidator
+    spec:
+      containers:
+        - name: solidator-pod
+          image: microtiling/solidator
+          imagePullPolicy: Always
+          env:
+            - name: DATABASE_HOST
+              value: "etcd-cluster-client"
+            - name: DATABASE_PORT
+              value: "8025"
+            - name: API_NODE
+              value: "ensicoincoin-service:4225"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ensicoincoin-service
+spec:
+  selector:
+    app: ensicoincion
+  ports:
+    - name: ensicoin
+      port: 4224
+      targetPort: 4224
+    - name: rpc
+      port: 4225
+      targetPort: 4225
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ensicoincoin-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ensicoincoin
+  template:
+    metadata:
+      labels:
+        app: ensicoincoin
+    spec:
+      containers:
+        - name: ensicoincoin-pod
+          image: johynpapin/ensicoincoin
+          imagePullPolicy: Always
+          args:
+            - "--mining"

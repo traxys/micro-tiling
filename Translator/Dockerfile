@@ -1,7 +1,13 @@
-FROM tiangolo/uwsgi-nginx-flask:python3.6-alpine3.7
+FROM alpine:latest
 
-RUN apk add gnupg py3-psycopg2
-RUN pip install pyinotify python-gnupg
-RUN pip install python-etcd
+RUN apk add python3 py3-pip dumb-init gnupg
+RUN pip3 install pyinotify python-gnupg Flask python-etcd
 
-COPY . /app
+WORKDIR /app
+COPY . .
+
+RUN mkdir jobs
+
+EXPOSE 80
+
+ENTRYPOINT [ "/usr/bin/dumb-init", "--", "/app/start.sh" ]

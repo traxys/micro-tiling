@@ -81,7 +81,7 @@ class Handler:
         return '250 Message accepted for delivery'
 
 
-controller = Controller(Handler())
+controller = Controller(Handler(), hostname="0.0.0.0")
 controller.start()
 
 while True:
