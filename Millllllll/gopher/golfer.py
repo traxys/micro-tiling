@@ -7,8 +7,15 @@ TCP_IP = '0.0.0.0'
 HOST = 'Golfer'
 TCP_PORT = 3333
 FILE_DIR = '/olala/gopher/files'
-DEFAULT_NOTIFIER = os.environ["DEFAULT_NOTIFIER"]
-POD_IP = os.environ["POD_IP"]
+
+DEFAULT_NOTIFIER = "localhost"
+if "DEFAULT_NOTIFIER" in os.environ:
+    DEFAULT_NOTIFIER = os.environ["DEFAULT_NOTIFIER"]
+
+POD_IP = "0.0.0.0"
+if "POD_IP" in os.environ:
+    POD_IP = os.environ["POD_IP"]
+
 
 def get_entries():
     """returns `[(DirEntry)]` as defined by the gopher protocol

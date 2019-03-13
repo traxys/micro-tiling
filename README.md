@@ -8,6 +8,8 @@ A running API is on `https://micro-tiling.tk/`. The documentation is availaible 
 You need ensicoins to run it, when the API state is needing it. You can get some on the [explorer](https://explorer.ensicoin.tk/), indeed currently all coinbases are spendable by everyone.
 Check out a [CLI for paying transactions](https://github.com/EnsicoinDevs/ensicoincoin-cli). Here is a presentation of what the micro-services do and how they communicate
 
+There is a python client library to use the REST api, but it does not handle the fee payment as of now.
+
 ![Alt text](./protocol.svg)
 
 ## Getting Started

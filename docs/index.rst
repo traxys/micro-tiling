@@ -14,7 +14,6 @@ Welcome to Micro Tiling's documentation!
    database
    golfer/index
    client_library/index
-   API/index
    a_pi/index
    Millllllll/index
    Unitator/index

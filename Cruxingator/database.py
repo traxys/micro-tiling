@@ -1,9 +1,13 @@
 import os
 import etcd
 
+DATABASE_HOST = "http://localhost"
+if "DATABASE_HOST" in os.environ:
+    DATABASE_HOST = os.environ["DATABASE_HOST"]
 
-DATABASE_HOST = os.environ["DATABASE_HOST"]
-DATABASE_PORT = int(os.environ["DATABASE_PORT"])
+DATABASE_PORT = "2379"
+if "DATABASE_PORT" in os.environ:
+    DATABASE_PORT = int(os.environ["DATABASE_PORT"])
 
 
 def open_db():

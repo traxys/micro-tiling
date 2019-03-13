@@ -1,5 +1,5 @@
 Flask Application
 =================
 
-.. automodule:: a_pi.main
+.. automodule:: a_pi.app
    :members:
