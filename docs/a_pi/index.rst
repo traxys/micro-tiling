@@ -6,6 +6,8 @@
 a_pi 
 ====
 
+This is the module responsible for generating random segments using the digits of pi.
+
 .. toctree::
    :maxdepth: 2
    

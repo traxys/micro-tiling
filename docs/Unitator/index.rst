@@ -6,6 +6,8 @@
 Unitator
 ========
 
+This services clips segments fetched from a gopher server into the unit square, then writes them to firefox
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:

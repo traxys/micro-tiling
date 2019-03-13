@@ -6,6 +6,8 @@
 Translator
 ======================================
 
+This translates and replicates segments from a inotify event and sends them by mail
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
