@@ -85,7 +85,7 @@ def create_points(point_list):
     '''Takes in a list of [(point_id, pos_x, pos_y, [list of neighbours' ids]),...]
     and output a list of **Point**
     '''
-    points = {p[0]:Point(p[1], p[2]) for p in point_list}
+    points = {p[0]:Point(Vect(p[1], p[2])) for p in point_list}
     for p in point_list:
         start_id = p[0]
         for neighbour_id in p[3]:
