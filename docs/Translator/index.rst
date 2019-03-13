@@ -13,5 +13,5 @@ This translates and replicates segments from a inotify event and sends them by m
    :caption: Contents:
     
    translator
-   inotify-serv
+   app
 
