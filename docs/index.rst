@@ -22,6 +22,11 @@ Welcome to Micro Tiling's documentation!
    Cruxingator/index
    Solidator/index
 
+REST API Usage
+==============
+
+.. swaggerv2doc:: docs/swagger.json
+
 Indices and tables
 ==================
 
