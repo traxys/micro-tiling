@@ -25,7 +25,7 @@ Welcome to Micro Tiling's documentation!
 REST API Usage
 ==============
 
-.. swaggerv2doc:: docs/swagger.json
+.. swaggerv2doc:: swagger.json
 
 Indices and tables
 ==================
