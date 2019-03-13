@@ -17,7 +17,7 @@ def translation(segments, job_id, gpg):
 
     database.update_state(database.open_db(), 16, job_id)
 
-    send(SMTP_HOST, segments, job_id, gpg)
+    send(SMTP_ADDR, segments, job_id, gpg)
 
 
 def encode(string):
