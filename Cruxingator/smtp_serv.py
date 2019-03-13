@@ -10,8 +10,13 @@ import os
 import socket
 
 
-SOLIDATOR_ADDRESS = os.environ["SOLIDATOR_ADDRESS"]
-SOLIDATOR_PORT = os.environ["SOLIDATOR_PORT"]
+SOLIDATOR_ADDRESS = "localhost"
+if "SOLIDATOR_ADDRESS" in os.environ:
+    SOLIDATOR_ADDRESS = os.environ["SOLIDATOR_ADDRESS"]
+
+SOLIDATOR_PORT = 2442
+if "SOLIDATOR_PORT" in os.environ:
+    SOLIDATOR_PORT = int(os.environ["SOLIDATOR_PORT"])
 
 
 def decrypt(string):
@@ -81,8 +86,9 @@ class Handler:
         return '250 Message accepted for delivery'
 
 
-controller = Controller(Handler())
-controller.start()
+if __name__ == "__main__":
+    controller = Controller(Handler())
+    controller.start()
 
-while True:
-    time.sleep(1)
+    while True:
+        time.sleep(1)
