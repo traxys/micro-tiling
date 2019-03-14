@@ -142,7 +142,7 @@ def remove_deg_1(points, job_id, multiprocess=True):
             m = messages.read(1)
             if m == 'r':
                 unprepared_processes -= 1
-            sleep(0.1)
+            sleep(0.001)
 
         database.update_state(database.open_db(), 28, job_id)
 
@@ -165,7 +165,7 @@ def remove_deg_1(points, job_id, multiprocess=True):
             if m == 'd':
                 number_deg1 -= 1
             print('deg1 left :', number_deg1)
-            sleep(0.1)
+            sleep(0.001)
 
         database.update_state(database.open_db(), 29, job_id)
 
@@ -188,7 +188,7 @@ def remove_deg_1(points, job_id, multiprocess=True):
             print('message :',m)
             if m == 'e':
                 processes_alive -= 1
-            sleep(0.1)
+            sleep(0.001)
         print('all processes dead')
 
         # write svg footer
