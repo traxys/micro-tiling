@@ -12,6 +12,8 @@ signification of messages to point_processes :
     d <neighbour_id> : the neighbouring point with neighbour_id
         had only one neighbour left 'alive' and is therefore
         now 'dead'.
+    
+    a : death acknowledge means the neighbour now knows the point is 'dead'
 
     A <neighbour_id> <neighbour_x_pos> <neighbour_y_pos> : the
         corresponding neighbour is still 'alive' (sent after the neighbour
@@ -154,8 +156,8 @@ def main():
             debug("one of my neighbours died !\n", own_id)
             
             dead_id = int(m.split()[1])
-            death_ack(write_neighbours[neighbours_id.index(dead_id)])
             if not neighbour_knows_im_dead:
+                death_ack(write_neighbours[neighbours_id.index(dead_id)])
                 debug("and he died before me !\n", own_id)
                 n_of_live_neighbours -= 1
                 if n_of_live_neighbours == 0 or n_of_live_neighbours >= 2:

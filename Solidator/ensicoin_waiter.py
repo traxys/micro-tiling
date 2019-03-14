@@ -49,7 +49,7 @@ def listen():
         points = solidator.create_points(segments)
         os.mkdir(job_id)
         os.chdir(job_id)
-        solidator.remove_deg_1(points, job_id)
+        solidator.remove_deg_1(points, job_id, False)
 
         result = open("result.svg", "r")
         svg_data = result.read()
