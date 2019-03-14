@@ -17,22 +17,35 @@ def listen():
 
     while True:
         conn, _ = listener.accept()
+
+        print("connection accepted")
+
         data = conn.recv(66).decode()
+
+        print("data:", data)
 
         _, flags = ensicoin.wait_for_pubkey(data)
 
-        print(flags)
+        print("flags: ", flags)
+
+        segments = None
+        job_id = None
 
         if flags[0][0] == "[":
             segments = json.loads(flags[0])
-            job_id = json.loads(flags[1])
+            job_id = flags[1]
 
         if flags[1][0] == "[":
             segments = json.loads(flags[1])
-            job_id = json.loads(flags[0])
+            job_id = flags[0]
+
+        print("segments: ", segments)
+        print("job_id: ", job_id)
 
         database.update_state(database.open_db(), 26, job_id)
 
+        print("saving results")
+        
         points = solidator.create_points(segments)
         os.mkdir(job_id)
         os.chdir(job_id)

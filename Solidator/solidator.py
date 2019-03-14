@@ -98,7 +98,7 @@ def open_process(point):
     '''Opens a process representing a *point*
     tells it how many neighbours it should expect and its *Point* *id*
     '''
-    proc = subprocess.Popen([abspath('./point_process.py'),
+    proc = subprocess.Popen([abspath('/app/point_process.py'),
                              str(len(point.linked)),
                              str(point.id)],
                             stdin=subprocess.PIPE,
