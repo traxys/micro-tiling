@@ -209,7 +209,11 @@ def remove_deg_1(points, job_id, multiprocess=True):
             p = deg1.pop()
             p.linked[0].linked.remove(p)
             if len(p.linked[0].linked) == 1:
+                # add p.linked[0] to deg1 if its degree has fallen to 1
                 deg1.append(p.linked[0])
+            elif p.linked[0].linked == []:
+                # in case p.linked[0] was already in deg1
+                deg1.remove(p.linked[0])
             p.linked = []
 
 
