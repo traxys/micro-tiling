@@ -241,7 +241,7 @@ spec:
             - name: DATABASE_PORT
               value: "2379"
             - name: API_NODE
-              value: "ensicoincoin-service:4225"
+              value: "78.248.188.120:4225"
             - name: SOLIDATOR_ADDRESS
               value: "solidator-service"
             - name: SOLIDATOR_PORT
@@ -283,7 +283,7 @@ spec:
             - name: DATABASE_PORT
               value: "2379"
             - name: API_NODE
-              value: "ensicoincoin-service:4225"
+              value: "78.248.188.120:4225"
 ---
 apiVersion: v1
 kind: Service
@@ -291,7 +291,7 @@ metadata:
   name: ensicoincoin-service
 spec:
   selector:
-    app: ensicoincion
+    app: ensicoincoin
   ports:
     - name: ensicoin
       port: 4224

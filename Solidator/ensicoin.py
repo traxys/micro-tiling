@@ -18,9 +18,24 @@ def generate_keys():
 def wait_for_pubkey(pubKey):
     """Blocks until a transaction is issued by *pubKey*
     """
+    print('waiting for pubkey: ' + pubKey)
+
     output = subprocess.check_output(['ensicoincoin-cli', 'waitforpubkey', '--pubkey', pubKey])
+    
+    print('received', output)
+
     lines = output.decode('ASCII').split('\n')
     flags = lines[1:len(lines) - 1]
+
+    for (i, flag) in enumerate(flags):
+        if flag[0] == "'":
+            flag = flag[1:]
+        if flag[len(flag)-1] == "'":
+            flag = flag[:-1]
+        
+        flags[i] = flag
+
+    print(lines, flags)
 
     return (lines[0], flags)
 

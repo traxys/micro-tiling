@@ -12,6 +12,8 @@ def generate_keys():
     priv_key = priv_key.split(':')[1].strip()
     pub_key = pub_key.split(':')[1].strip()
 
+    print(priv_key, pub_key)
+
     return (priv_key, pub_key)
 
 
@@ -57,6 +59,10 @@ def send_to(value, outpoint_hash, outpoint_index, privkey_from, spent_output_val
         args.append('--spentoutputvalue')
         args.append(str(spent_output_value))
 
+    print(args)
+
     output = subprocess.check_output(args)
+
+    print(output)
 
     return output.decode('ASCII').split('\n')[0]
