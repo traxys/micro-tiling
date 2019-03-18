@@ -113,6 +113,9 @@ class Point:
         """ Tells two points are equivalent
         """
         self.linked += other.linked
+        for neighbour in other.linked:
+            neighbour.linked.remove(other)
+            neighbour.linked.append(self)
 
     def get_pos(self, precision=3e-4):
         """Get a rounded position at *precision* level
