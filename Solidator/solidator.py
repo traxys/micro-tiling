@@ -11,7 +11,7 @@ from os.path import abspath
 from os import getpid, mkfifo, system
 from time import sleep
 import sys
-import database
+# import database
 
 
 class Vect:
@@ -133,7 +133,7 @@ def remove_deg_1(points, job_id, multiprocess=True):
         for p in points:
             p.msg = open('msg_' + str(p.id), 'w')
 
-        database.update_state(database.open_db(), 27, job_id)
+        # database.update_state(database.open_db(), 27, job_id)
 
         # wait untill every process has finished starting up
         unprepared_processes = len(points)
@@ -144,7 +144,7 @@ def remove_deg_1(points, job_id, multiprocess=True):
                 unprepared_processes -= 1
             sleep(0.001)
 
-        database.update_state(database.open_db(), 28, job_id)
+        # database.update_state(database.open_db(), 28, job_id)
 
         # tell each process the position of the point they represent
         # and the id of their neighbours
@@ -167,7 +167,7 @@ def remove_deg_1(points, job_id, multiprocess=True):
             print('deg1 left :', number_deg1)
             sleep(0.001)
 
-        database.update_state(database.open_db(), 29, job_id)
+        # database.update_state(database.open_db(), 29, job_id)
 
         # write svg header
         res = open('result.svg', 'w')
@@ -197,12 +197,16 @@ def remove_deg_1(points, job_id, multiprocess=True):
         res.flush()
         res.close()
 
-        database.update_state(database.open_db(), 30, job_id)
+        # database.update_state(database.open_db(), 30, job_id)
 
         # cleanup all fifos
         system('rm msg_*')
 
     else:
+        # useful to prevent outputting the same line twice
+        for i,p in enumerate(points):
+            p.id = i
+
         deg1 = [p for p in points if len(p.linked)==1]
 
         while deg1:
@@ -226,10 +230,11 @@ def remove_deg_1(points, job_id, multiprocess=True):
         svg_coord = lambda x: x*svg_scale + 3*svg_scale
         for p in points:
             for p2 in p.linked:
-                res.write(line_blueprint.format(svg_coord(position[0]),
-                                                svg_coord(position[1]),
-                                                svg_coord(float(m.split()[2])),
-                                                svg_coord(float(m.split()[3]))))
+                if p.id < p2.id:
+                    res.write(line_blueprint.format(svg_coord(p.pos.x),
+                                                    svg_coord(p.pos.y),
+                                                    svg_coord(p2.pos.x),
+                                                    svg_coord(p2.pos.y)))
         res.write('</svg>\n')
         res.flush()
         res.close()
@@ -266,5 +271,5 @@ if __name__ == "__main__":
     img.write('</svg>\n')
     img.flush()
     img.close()
-    remove_deg_1(points)
+    remove_deg_1(points, 1, False)
 

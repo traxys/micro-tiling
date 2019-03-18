@@ -106,7 +106,7 @@ class Point:
         """
         self.linked += other.linked
 
-    def get_pos(self, precision=1e-10):
+    def get_pos(self, precision=3e-4):
         """Get a rounded position at *precision* level
         """
         return (int(self.pos.x/precision)*precision,
@@ -153,9 +153,18 @@ def cut(segments):
 
 
     #merge points at same locations
+    precision = 1./256/256
+    close_positions = [(precision, 0),
+                       (precision, precision),
+                       (0, precision),
+                       (-precision, precision),
+                       (-precision, 0),
+                       (-precision, -precision),
+                       (0, -precision),
+                       (precision, -precision)]
     points_at_pos = {}
     for p in points:
-        pos = p.get_pos()
+        pos = p.get_pos(precision)
         try:
             points_at_pos[pos].append(p)
         except KeyError:
@@ -164,19 +173,28 @@ def cut(segments):
 
     points = []
     for pos in points_at_pos:
-        similar_pos = points_at_pos[pos]
-        points.append(similar_pos[0])
-        for cousin in similar_pos[1:]:
-            similar_pos[0].merge(cousin)
-        for i,p2 in enumerate(similar_pos[0].linked):
-            similar_pos[0].linked[i] = points_at_pos[p2.get_pos()][0]
+        similar_pos = points_at_pos[pos]# list of superposed points
+        points_at_pos[pos] = []
+        for dx, dy in close_positions:
+            try:
+                similar_pos += points_at_pos[(pos[0]+dx, pos[1]+dy)]
+            except KeyError:
+                pass
+            else:
+                points_at_pos[(pos[0]+dx, pos[1]+dy)] = []
+        if similar_pos:
+            points.append(similar_pos[0])
+            for cousin in similar_pos[1:]:
+                similar_pos[0].merge(cousin)
     return points
 
 
 if __name__ == "__main__":
     from matplotlib import pyplot as plt
-    points = cut([Segment(Vect(0,0), Vect(1,1)), Segment(Vect(0.1, 0.7), Vect(1, 0.2))])
-    print(points)
+    points = cut([Segment(Vect(0,0), Vect(1,1)),
+                  Segment(Vect(0.1, 0.7), Vect(1, 0.2)),
+                  Segment(Vect(0.3, 0.75), Vect(.8, .15))])
+    print([(p, len(p.linked)) for p in points])
     for p in points:
         for p2 in p.linked:
             if p2.pos.x >= p.pos.x:
