@@ -41,6 +41,9 @@ class Vect:
     def __pow__(self, other):
         return self.x * other.x + self.y * other.y
 
+    def __repr__(self):
+        return "Vect("+str(self.x)+", "+str(self.y)+")"
+
 
 class Segment:
     """Segment between two endpoints
@@ -67,6 +70,11 @@ class Segment:
         k2 = -aa.x*inv_base[1, 0] - aa.y*inv_base[1, 1]
         return k1, k2
 
+    def __str__(self):
+        return "segment("+str(self.a)+", "+str(self.b)+")"
+    def __repr__(self):
+        return str(self)
+
 
 def pairs(l):
     """Iterate on pairs of segments
@@ -83,7 +91,7 @@ def find_intersections(segments):
         s.intersections = []
     for s1, s2 in pairs(segments):
         k1, k2 = s1.intersect(s2)
-        print(k1, k2)
+        print(s1, s2, k1, k2)
         if 0 <= k1 <= 1 and 0 <= k2 <= 1:
             s1.intersections.append((k1, s2))
             s2.intersections.append((k2, s1))
@@ -153,7 +161,7 @@ def cut(segments):
 
 
     #merge points at same locations
-    precision = 1./256/256
+    precision = 1./256/256# same precision as rotations
     close_positions = [(precision, 0),
                        (precision, precision),
                        (0, precision),
