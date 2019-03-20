@@ -63,7 +63,7 @@ def signal_death(neighbour_messagers, own_id):
     debug('I DIED !!!\n', own_id)
 
 def death_ack(fifo):
-    fifo.write('a\n')
+    fifo.write('f\n')
     fifo.flush()
 
 def who_am_i_at_the_end(is_dead, neighbour_messagers, own_id, position):
@@ -150,8 +150,9 @@ def main():
         if m == '':
             continue
         elif m[0] == 'e':
-            end = True
-            res = open('result.svg', 'a')
+            if not(end):
+                end = True
+                res = open('result.svg', 'a')
             who_am_i_at_the_end(dead, write_neighbours, own_id, position)
 
         elif m[0] == 'd':
@@ -160,19 +161,22 @@ def main():
             dead_id = int(m.split()[1])
             if not neighbour_knows_im_dead:
                 death_ack(write_neighbours[neighbours_id.index(dead_id)])
-                debug("and he died before me !\n", own_id)
+                debug("my neighbour "+str(dead_id)+" has died. Let me pay my respects!\n", own_id)
                 n_of_live_neighbours -= 1
                 if n_of_live_neighbours == 0 or n_of_live_neighbours >= 2:
                     write_main.write('d')
                     write_main.flush()
 
-        elif m[0] == 'a':
+        elif m[0] == 'f':
             neighbour_knows_im_dead = True
 
         elif m[0] == 'D':
             dead_processes += 1
 
         elif m[0] == 'A':
+            if not(end):
+                res = open('result.svg', 'a')
+                end = True
             dead_processes += 1
             if not dead:
                 svg_output(m, own_id, position, res)

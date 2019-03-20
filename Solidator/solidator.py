@@ -271,5 +271,5 @@ if __name__ == "__main__":
     img.write('</svg>\n')
     img.flush()
     img.close()
-    remove_deg_1(points, 1, False)
+    remove_deg_1(points, 1)
 
