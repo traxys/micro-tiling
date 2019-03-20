@@ -70,7 +70,7 @@ def action(db, job_id, job_current):
     if job_current == 0:
         segments.append(segment_generator.random_segment(1, 1))
     else:
-        segments.append(segment_generator.random_segment(2, 2))
+        segments.append(segment_generator.random_segment(1.2, 1.2))
     db.write("/a_pi/{}/segments".format(job_id), json.dumps(segments))
 
 

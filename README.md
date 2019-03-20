@@ -82,9 +82,9 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Authors
 
-* **Aurélien Moisson-franckhauser** - *Initial work* [aurelienMoisson](https://github.com/aurelienMoisson)
+* **Aurélien Moisson-franckhauser** - *brainfuck development and Solidator swarm* [aurelienMoisson](https://github.com/aurelienMoisson)
 * **Johyn Papin** - *Initial work* - [johynpapin](https://github.com/johynpapin)
-* **Quentin Boyer** - *Initial work* - [traxys](https://github.com/traxys)
+* **Quentin Boyer** - *Protocol implementations* - [traxys](https://github.com/traxys)
 
 See also the list of [contributors](https://github.com/traxys/micro-tiling/contributors) who participated in this project.
 

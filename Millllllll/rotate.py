@@ -5,8 +5,8 @@ import subprocess
 import bf_interpreter
 
 
-points = [(0.5, 0.7)]  # , (0.2, 0.3)]
-
+points = [(0.5, 0.7)]#, (0.6, 0.3)]
+segments = [[(0.5, 0.7), (0.6, 0.3)]]
 
 def encode(vect):
     """Takes a **point** *vect* and converts it to six bytes
@@ -46,7 +46,8 @@ def go_through_brainfuck(file_name, point, use_python=False):
 def mirror_and_turn(points, use_python=False):
     '''*points* need to be tuples or lists of floats
     '''
-    after_symmetry = list(points)[:]
+    points = list(points)
+    after_symmetry = points[:]
     for point in points:
         after_symmetry.append(go_through_brainfuck('symmetry.bf',
                                                    point, use_python))
@@ -78,7 +79,16 @@ def mirror_and_turn_segments(segments, use_python=False):
 
 
 if __name__ == "__main__":
-    result = mirror_and_turn(points, True)
-    print(result)
-#   plt.plot([p[0] for p in result], [p[1] for p in result])
-#   plt.show()
+    from matplotlib import pyplot as plt
+    # points :
+    '''
+    result = mirror_and_turn(points)
+    plt.plot([p[0] for p in result], [p[1] for p in result])
+    '''
+    
+    # segments :
+    result = mirror_and_turn_segments(segments)
+    for s in result:
+        plt.plot([s[i][0] for i in [0,1]], [s[i][1] for i in [0,1]])
+
+    plt.show()

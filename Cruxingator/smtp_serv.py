@@ -63,7 +63,7 @@ class Handler:
         message = envelope.content.decode('utf8', errors='replace')
         message = decrypt(message)
 
-        job_id = message.split("|")[0]
+        job_id = message.split("|")[0].strip()
         database.update_state(database.open_db(), 20, job_id)
         segments = json.loads(message.split("|")[1].strip())
         new_segments = []
@@ -74,7 +74,7 @@ class Handler:
         cut_segments = split.cut(new_segments)
         database.update_state(database.open_db(), 22, job_id)
 
-        print(job_id)
+        print('job_id: ', job_id)
 
         pk1, sk1 = ensicoin.generate_keys()
         database.open_db().write("/{}/address".format(job_id), pk1)
@@ -84,18 +84,28 @@ class Handler:
 
         solidator_socket = socket.create_connection((SOLIDATOR_ADDRESS,
                                                      SOLIDATOR_PORT))
+        
+        print('sending pk2')
+
         solidator_socket.send(pk2.encode())
         database.update_state(database.open_db(), 23, job_id)
+        
+        print('waiting for payment')
+        
         hashtx, _ = ensicoin.wait_for_pubkey(pk1)
+
+        print('hashtx: ', hashtx)
 
         ensicoin.send_to(10,
                          hashtx,
                          0,
                          sk1,
-                         1,
+                         42,
                          pk2,
                          [job_id,
-                          json.dumps(split.generate_id_tuple(cut_segments))])
+                          "'" + json.dumps(split.generate_id_tuple(cut_segments)) + "'"])
+
+        print('payment sent')
 
         database.update_state(database.open_db(), 24, job_id)
 
