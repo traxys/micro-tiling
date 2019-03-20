@@ -139,6 +139,7 @@ def main():
     dead = False
     end = False
     neighbour_knows_im_dead = False
+    output_opened = False
 
     while not(end) or dead_processes < n_of_neighbours:
         if not(dead) and n_of_live_neighbours == 1:
@@ -150,9 +151,10 @@ def main():
         if m == '':
             continue
         elif m[0] == 'e':
-            if not(end):
-                end = True
+            if not(output_opened):
                 res = open('result.svg', 'a')
+                output_opened = True
+            end = True
             who_am_i_at_the_end(dead, write_neighbours, own_id, position)
 
         elif m[0] == 'd':
@@ -176,7 +178,7 @@ def main():
         elif m[0] == 'A':
             if not(end):
                 res = open('result.svg', 'a')
-                end = True
+                output_opened = True
             dead_processes += 1
             if not dead:
                 svg_output(m, own_id, position, res)

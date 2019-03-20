@@ -251,6 +251,7 @@ if __name__ == "__main__":
     p4 = Point(Vect(1, 0))
     p5 = Point(Vect(1, 2))
     p6 = Point(Vect(2, 1))
+
     
     link(p5, p1)
     link(p6, p1)
