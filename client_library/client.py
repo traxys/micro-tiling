@@ -38,6 +38,7 @@ def manage_state(host, result):
                                 job_id +
                                 "/state").text)
         if state["state"] == "finished":
+            result.append(fetch_segments(host, job_id))
             break
         if state["state"] == "error":
             job_id = launch_job(host)
@@ -58,6 +59,14 @@ def generate_mosaic(host, on_invoice):
     return result[0]
 
 
+def fetch_segments(host, job_id):
+    result = json.loads(requests.get(
+                                host +
+                                job_id +
+                                "/result").text)
+    return result["result"]
+
+
 if __name__ == "__main__":
     import progressbar
 
@@ -71,6 +80,9 @@ if __name__ == "__main__":
         result = []
         for completion, state, _ in manage_state(host, result):
             bar.update(completion)
+        f = open("output.svg", "w")
+        f.write(result[0])
+        f.close()
 
     import sys
     wrap_bar(sys.argv[1])
