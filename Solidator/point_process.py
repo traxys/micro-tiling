@@ -147,7 +147,9 @@ def main():
 
         m = messages.readline()
 
-        if m[0] == 'e':
+        if m == '':
+            continue
+        elif m[0] == 'e':
             end = True
             res = open('result.svg', 'a')
             who_am_i_at_the_end(dead, write_neighbours, own_id, position)
