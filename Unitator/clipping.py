@@ -44,21 +44,27 @@ def clip_right(lines):
     """
     out = []
     for l in lines:
-        if l.a.x > 1:
-            continue
         if l.a.x == l.b.x:
+            # in case line is vertical (the maths below doesn't work)
             if l.a.x < 1:
                 out.append(l)
         else:
-            k = (l.a.x-1)/(l.a.x-l.b.x)
-            ab = p(l.b.x-l.a.x, l.b.y-l.a.y)
-            if 0 < k < 1:
-                if l.a.x > l.b.x:
-                    out.append(segment(l.a + ab*k, l.b))
-                else:
-                    out.append(segment(l.a, l.b - ab*(1-k)))
+            if min(l.a.x, l.b.x) >= 1:
+                # in case the line is completely right of the x=1
+                continue
             else:
-                out.append(l)
+                # calculate intersection with line x = 1
+                k = (l.a.x-1)/(l.a.x-l.b.x)
+                ab = p(l.b.x-l.a.x, l.b.y-l.a.y)
+                if 0 < k < 1:
+                    # add the right side of the line
+                    if l.a.x > l.b.x:
+                        out.append(segment(l.a + ab*k, l.b))
+                    else:
+                        out.append(segment(l.a, l.b - ab*(1-k)))
+                else:
+                    # if lines don't intersect
+                    out.append(l)
     return out
 
 
