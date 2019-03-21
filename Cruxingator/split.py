@@ -91,7 +91,6 @@ def find_intersections(segments):
         s.intersections = []
     for s1, s2 in pairs(segments):
         k1, k2 = s1.intersect(s2)
-        print(s1, s2, k1, k2)
         if 0 <= k1 <= 1 and 0 <= k2 <= 1:
             s1.intersections.append((k1, s2))
             s2.intersections.append((k2, s1))
@@ -160,7 +159,6 @@ def cut(segments):
         points.append(new_point)
         last_point.linked.append(new_point)
         new_point.linked.append(last_point)
-    print(points)
 
 
     #merge points at same locations
@@ -180,7 +178,6 @@ def cut(segments):
             points_at_pos[pos].append(p)
         except KeyError:
             points_at_pos[pos] = [p]
-    print(points_at_pos)
 
     points = []
     for pos in points_at_pos:

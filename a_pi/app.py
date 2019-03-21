@@ -39,22 +39,7 @@ def close_db(e=None):
 
 
 def make_pi(total):
-    """Generates up to *total* digits of pi
-    """
-    q, r, t, k, m, x = 1, 0, 1, 1, 3, 3
-    count = 0
-    while True:
-        if 4 * q + r - t < m * t:
-            yield m
-            count += 1
-            if count > total:
-                break
-            q, r, t, k, m, x = 10*q, 10*(r-m*t), t, k, \
-                (10*(3*q+r))//t - 10*m, x
-        else:
-            q, r, t, k, m, x = q*k, (2*q+r)*x, t*x, k+1, \
-                (q*(7*k+2)+r*x)//(t*x), x+2
-
+    return list('3141592653589793238462643383279502884197169399375105820974944592307816406286')
 
 def action(db, job_id, job_current):
     """Advances the state of the job *job_id* using the state *job_current* as
@@ -114,7 +99,7 @@ def create_app(test_config=None):
     channel = grpc.insecure_channel(MILLLLLLLL_ADDR)
     mill_stub = mill_pb2_grpc.MillStub(channel)
 
-    pi = [str(d) for d in make_pi(MAX_PI)]
+    pi = make_pi(MAX_PI)
 
     @app.route('/health', methods=('GET',))
     def health():

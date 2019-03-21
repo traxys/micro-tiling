@@ -49,9 +49,7 @@ func getPublicState(state int) string {
 	return ""
 }
 
-func generateAndSendSegments(kapi client.KeysAPI, jobId string) {
-	digits := rand.Intn(MAX_SEGMENTS-MIN_SEGMENTS) + MIN_SEGMENTS
-
+func generateAndSendSegments(kapi client.KeysAPI, jobId string, digits int) {
 	_, err := kapi.Set(context.Background(), fmt.Sprintf("/%s/state", jobId), "1", nil)
 	if err != nil {
 		log.Println("error writing state", err)
@@ -158,9 +156,16 @@ func main() {
 	})
 
 	r.POST("/", func(c *gin.Context) {
+		segments := c.PostForm("segments")
+
+		digits, err := strconv.Atoi(segments)
+		if err != nil {
+			digits = rand.Intn(MAX_SEGMENTS-MIN_SEGMENTS) + MIN_SEGMENTS
+		}
+
 		jobId := uuid.NewV4().String()
 
-		_, err := kapi.Set(context.Background(), fmt.Sprintf("/%s/state", jobId), "0", nil)
+		_, err = kapi.Set(context.Background(), fmt.Sprintf("/%s/state", jobId), "0", nil)
 		if err != nil {
 			c.JSON(500, gin.H{
 				"error": err,
@@ -168,7 +173,7 @@ func main() {
 			return
 		}
 
-		go generateAndSendSegments(kapi, jobId)
+		go generateAndSendSegments(kapi, jobId, digits)
 
 		c.JSON(200, gin.H{
 			"id": jobId,

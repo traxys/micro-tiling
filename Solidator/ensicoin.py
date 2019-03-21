@@ -27,6 +27,8 @@ def wait_for_pubkey(pubKey):
     lines = output.decode('ASCII').split('\n')
     flags = lines[1:len(lines) - 1]
 
+    print(flags)
+
     for (i, flag) in enumerate(flags):
         if flag[0] == "'":
             flag = flag[1:]

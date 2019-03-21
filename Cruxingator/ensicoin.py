@@ -1,7 +1,7 @@
 """Wrapper around ensicoincoin-cli
 """
 import subprocess
-
+import os
 
 def generate_keys():
     """Generates a pair of (**private_key**, **public_key**)
@@ -37,17 +37,14 @@ def wait_for_flag(flag):
     return flags
 
 
-def send_to(value, outpoint_hash, outpoint_index, privkey_from, spent_output_value, pubkey_to, flags):
+def send_to(value, outpoint_hash, outpoint_index, privkey_from, spent_output_value, pubkey_to, flags, uid):
     """Sends a transaction
     """
     args = ['ensicoincoin-cli', 'sendto',
             '--outpointhash', outpoint_hash,
             '--outpointindex', str(outpoint_index),
-            '--value', str(value)]
-
-    for flag in flags:
-        args.append('--flag')
-        args.append(flag)
+            '--value', str(value),
+            '--flagsfile', uid + '.txt']
 
     if pubkey_to != '':
         args.append('--pubkey')
@@ -61,8 +58,17 @@ def send_to(value, outpoint_hash, outpoint_index, privkey_from, spent_output_val
 
     print(args)
 
+    f = open(uid + '.txt', 'w')
+
+    for flag in flags:
+        f.write(flag + '\n')
+
+    f.close()
+
     output = subprocess.check_output(args)
 
     print(output)
+
+    os.remove(uid + '.txt')
 
     return output.decode('ASCII').split('\n')[0]

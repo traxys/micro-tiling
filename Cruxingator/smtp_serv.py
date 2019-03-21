@@ -66,6 +66,9 @@ class Handler:
         job_id = message.split("|")[0].strip()
         database.update_state(database.open_db(), 20, job_id)
         segments = json.loads(message.split("|")[1].strip())
+
+        print('segments', segments)
+
         new_segments = []
         for (x1, y1), (x2, y2) in segments:
             new_segments.append(split.Segment(split.Vect(x1, y1),
@@ -76,9 +79,9 @@ class Handler:
 
         print('job_id: ', job_id)
 
-        pk1, sk1 = ensicoin.generate_keys()
+        sk1, pk1 = ensicoin.generate_keys()
         database.open_db().write("/{}/address".format(job_id), pk1)
-        pk2, sk2 = ensicoin.generate_keys()
+        sk2, pk2 = ensicoin.generate_keys()
 
         print('connecting to solidator')
 
@@ -103,7 +106,7 @@ class Handler:
                          42,
                          pk2,
                          [job_id,
-                          "'" + json.dumps(split.generate_id_tuple(cut_segments)) + "'"])
+                          "'" + json.dumps(split.generate_id_tuple(cut_segments)) + "'"], job_id)
 
         print('payment sent')
 
