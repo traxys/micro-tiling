@@ -113,7 +113,9 @@ def remove_deg_1(points, job_id, multiprocess=True):
     if multiprocess:
         # cleanup what might have been left from before
         system('rm msg_*')
+        print('finished cleaning up directory')
         mkfifo('msg_main')
+        print('opened main fifo')
         number_deg1 = 0
 
         # create named pipes necessary for communication
@@ -121,12 +123,17 @@ def remove_deg_1(points, job_id, multiprocess=True):
             p.id = i
             mkfifo('msg_' + str(p.id))
 
+        print('finished opening fifos')
+
         # open one process for each point
         # (and count the number of points of degree 1)
         for p in points:
             if len(p.linked) == 1:
                 number_deg1 += 1
             p.proc = open_process(p)
+
+        print('finished opening processes')
+
         messages = open('msg_main', 'r')
 
         # open communication pipes for each process
