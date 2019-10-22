@@ -67,7 +67,7 @@ sphinx-rtd-theme==0.4.3
 sphinxcontrib-websupport==1.1.0
 SQLAlchemy==1.2.18
 tzlocal==1.5.1
-urllib3==1.24.1
+urllib3==1.24.2
 webencodings==0.5.1
 Werkzeug==0.15.3
 Whoosh==2.7.4
