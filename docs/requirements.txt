@@ -69,7 +69,7 @@ SQLAlchemy==1.2.18
 tzlocal==1.5.1
 urllib3==1.24.1
 webencodings==0.5.1
-Werkzeug==0.14.1
+Werkzeug==0.15.3
 Whoosh==2.7.4
 yapf==0.26.0
 python-etcd==0.4.5
