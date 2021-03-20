@@ -23,7 +23,7 @@ idna==2.8
 imagesize==1.1.0
 itsdangerous==1.1.0
 jedi==0.13.3
-Jinja2==2.10
+Jinja2==2.11.3
 kiwisolver==1.0.1
 lockfile==0.12.2
 MarkupSafe==1.1.1
