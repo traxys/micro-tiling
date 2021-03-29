@@ -43,7 +43,7 @@ py3status==3.16
 pycodestyle==2.5.0
 pydocstyle==3.0.0
 pyflakes==2.1.1
-Pygments==2.3.1
+Pygments==2.7.4
 pyinotify==0.9.6
 pynvim==0.3.2
 pyparsing==2.3.1
